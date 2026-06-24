@@ -264,6 +264,35 @@
   .sim-name{font-weight:700}
   .bk-side.sim .nm{color:var(--accent)}
 
+  /* Odds view — title race + probability table */
+  #titleRace{padding:var(--sp-3) var(--sp-4) var(--sp-4)}
+  .tr-row{display:grid; grid-template-columns:minmax(120px,180px) 1fr 44px; align-items:center;
+    gap:var(--sp-3); margin-bottom:var(--sp-2); font-size:var(--fs-sm)}
+  .tr-nm{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .tr-row.es .tr-nm{color:var(--high-ink)}
+  .tr-bar{height:14px; background:var(--line); border-radius:999px; overflow:hidden}
+  .tr-bar i{display:block; height:100%; background:linear-gradient(90deg,var(--brand-2),var(--good));
+    border-radius:999px}
+  .tr-pct{font-variant-numeric:tabular-nums; font-weight:700; text-align:right; color:var(--ink)}
+  #oddsTable{width:100%; border-collapse:collapse; font-size:var(--fs-sm)}
+  #oddsTable th{font-size:var(--fs-2xs); text-transform:uppercase; letter-spacing:.4px; color:var(--muted);
+    font-weight:700; padding:var(--sp-2) var(--sp-2); border-bottom:1px solid var(--line); text-align:center;
+    cursor:pointer; white-space:nowrap; user-select:none}
+  #oddsTable th:hover{color:var(--brand)}
+  #oddsTable th.sorted{color:var(--brand)}
+  #oddsTable th.odds-team{text-align:left; padding-left:var(--sp-4)}
+  #oddsTable td{padding:6px var(--sp-2); border-bottom:1px solid var(--line); text-align:center;
+    font-variant-numeric:tabular-nums}
+  #oddsTable td.odds-team{text-align:left; padding-left:var(--sp-4); font-weight:600; white-space:nowrap}
+  #oddsTable tr.es td.odds-team{color:var(--high-ink)}
+  #oddsTable tbody tr:hover td{background:color-mix(in srgb,var(--brand) 5%,transparent)}
+  #oddsTable td.odds-champ .pc{font-weight:800}
+  .pc{display:inline-block; min-width:34px; padding:2px 6px; border-radius:var(--radius-sm);
+    font-weight:600; font-variant-numeric:tabular-nums}
+  .pc0{color:var(--line-strong)}
+  .stand th.adv,.stand td.adv{text-align:center; padding-right:var(--sp-3)}
+  .stand td.adv .pc{min-width:30px; font-size:var(--fs-2xs)}
+
   .badge{display:inline-block; font-size:var(--fs-3xs); font-weight:700; padding:3px var(--sp-2); border-radius:999px;
     text-transform:uppercase; letter-spacing:.4px; white-space:nowrap}
   .b-live{background:var(--live); color:#fff; animation:pulse 1.6s infinite}
@@ -449,6 +478,7 @@
     <button type="button" class="tab" role="tab" id="tab-watch" data-view="watch" aria-selected="false" aria-controls="view-watch" tabindex="-1">Spanish-speaking teams</button>
     <button type="button" class="tab" role="tab" id="tab-groups" data-view="groups" aria-selected="false" aria-controls="view-groups" tabindex="-1">Groups &amp; Standings</button>
     <button type="button" class="tab" role="tab" id="tab-bracket" data-view="bracket" aria-selected="false" aria-controls="view-bracket" tabindex="-1">Knockout bracket</button>
+    <button type="button" class="tab" role="tab" id="tab-odds" data-view="odds" aria-selected="false" aria-controls="view-odds" tabindex="-1">Odds</button>
   </div>
 
   <!-- MATCHES VIEW -->
@@ -552,6 +582,31 @@
       <span><span class="sw" style="background:var(--good)"></span>Confirmed competitor</span>
       <span><span class="sw" style="background:var(--high)"></span>Spanish-speaking team</span>
       <span>Italic entries are not yet decided (group winner / match winner placeholders).</span>
+    </p>
+  </section>
+
+  <!-- ODDS VIEW -->
+  <section id="view-odds" class="hide" role="tabpanel" aria-labelledby="tab-odds" tabindex="0">
+    <div class="panel" style="margin-bottom:var(--sp-4)">
+      <div class="panel-head">
+        <h2>Title race</h2>
+        <span class="hint">Probability of winning the tournament</span>
+      </div>
+      <div id="titleRace"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Tournament odds</h2>
+        <span class="hint">Click a column to sort</span>
+      </div>
+      <div class="scroll-x">
+        <table id="oddsTable"></table>
+      </div>
+    </div>
+    <p class="legend">
+      <span><span class="sw" style="background:var(--good)"></span>Champion odds</span>
+      <span><span class="sw" style="background:var(--high)"></span>Spanish-speaking team</span>
+      <span>From Elo ratings, results so far, and the Monte-Carlo simulator. Win=win group, Adv=reach knockouts.</span>
     </p>
   </section>
 
@@ -1128,6 +1183,7 @@ function computeGroupProbs(){
   GROUP_PROBS = next; GROUP_SIG = nextSig;
   // Third-place qualification is cross-group, so cache it on the combined signature.
   if(THIRD_SIG!==combined){ computeThirdQual(2500); THIRD_SIG=combined; }
+  clearSlotMemo();   // group probabilities changed → bracket distributions are stale
 }
 
 function renderGroups(){
@@ -1136,21 +1192,68 @@ function renderGroups(){
     const rows = computeStandings(g);
     const played = MATCHES.filter(m=>m.group===g && m.ft).length;
     const total = MATCHES.filter(m=>m.group===g).length;
-    const body = rows.map((r,i)=>`
+    const gp = GROUP_PROBS[g] || {};
+    const advOf = t => { const p=gp[t]; return Math.min(1, (p?p.p1+p.p2:0) + (THIRD_QUAL[t]||0)); };
+    const body = rows.map((r,i)=>{
+      const adv = advOf(r.team);
+      return `
       <tr class="${i<2?'q':''}">
         <td class="pos">${i+1}</td>
         <td class="team">${esc(r.team)}</td>
         <td>${r.P}</td><td>${r.W}</td><td>${r.D}</td><td>${r.L}</td>
         <td>${r.GF}:${r.GA}</td><td>${r.GD>0?'+':''}${r.GD}</td>
         <td class="pts">${r.Pts}</td>
-      </tr>`).join("");
+        <td class="adv">${pctCell(adv)}</td>
+      </tr>`;}).join("");
     return `<div class="group-card">
       <h3>${esc(g)} <span class="gmeta">${played}/${total} played</span></h3>
       <table class="stand">
-        <thead><tr><th class="pos"></th><th class="team">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF:GA</th><th>GD</th><th>Pts</th></tr></thead>
+        <thead><tr><th class="pos"></th><th class="team">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF:GA</th><th>GD</th><th>Pts</th><th class="adv" title="Probability of reaching the knockouts">Adv</th></tr></thead>
         <tbody>${body}</tbody>
       </table></div>`;
   }).join("");
+}
+
+/* ---------------- Odds view ---------------- */
+// A probability cell: value text + a heat tint (sqrt-scaled so small odds still show).
+function pctCell(v){
+  if(!(v>0)) return `<span class="pc0">—</span>`;
+  const tint = Math.round(Math.min(1, Math.sqrt(v))*62);
+  return `<span class="pc" style="background:color-mix(in srgb,var(--brand-2) ${tint}%,transparent)">${fmtPct(v*100)}</span>`;
+}
+let oddsSort = {key:"champ", dir:-1};   // dir -1 = descending
+function renderOdds(){
+  const rows = tournamentOdds();
+  rows.sort((a,b)=> oddsSort.key==="team"
+    ? a.team.localeCompare(b.team)*oddsSort.dir
+    : (a[oddsSort.key]-b[oddsSort.key])*oddsSort.dir || b.champ-a.champ || a.team.localeCompare(b.team));
+
+  // Title-race bars: always top-12 by championship odds, regardless of table sort.
+  const top = [...rows].sort((a,b)=> b.champ-a.champ).slice(0,12);
+  const maxCh = Math.max(0.01, ...top.map(t=>t.champ));
+  el("titleRace").innerHTML = top.map(t=>{
+    const flag = FLAGS[t.team] || "▢";
+    return `<div class="tr-row${t.spanish?' es':''}">
+      <span class="tr-nm">${flag} ${esc(t.team)}</span>
+      <span class="tr-bar"><i style="width:${Math.max(1.5, t.champ/maxCh*100)}%"></i></span>
+      <span class="tr-pct">${fmtPct(t.champ*100)}</span>
+    </div>`;
+  }).join("");
+
+  const cols = [["team","Team"],["win","Win"],["adv","Adv"],["r16","R16"],["qf","QF"],["sf","SF"],["fin","Final"],["champ","🏆"]];
+  const arrow = k => oddsSort.key===k ? (oddsSort.dir<0?" ↓":" ↑") : "";
+  const head = `<thead><tr>`+cols.map(([k,lbl])=>
+    `<th data-key="${k}" class="${k==="team"?"odds-team":""}${oddsSort.key===k?" sorted":""}"${k==="champ"?' title="Win the tournament"':""}>${lbl}${arrow(k)}</th>`).join("")+`</tr></thead>`;
+  const bodyRows = rows.map(t=>{
+    const flag = FLAGS[t.team] || "▢";
+    return `<tr class="${t.spanish?"es":""}">
+      <td class="odds-team">${flag} ${esc(t.team)}</td>
+      <td>${pctCell(t.win)}</td><td>${pctCell(t.adv)}</td><td>${pctCell(t.r16)}</td>
+      <td>${pctCell(t.qf)}</td><td>${pctCell(t.sf)}</td><td>${pctCell(t.fin)}</td>
+      <td class="odds-champ">${pctCell(t.champ)}</td>
+    </tr>`;
+  }).join("");
+  el("oddsTable").innerHTML = head+`<tbody>${bodyRows}</tbody>`;
 }
 
 /* ---------------- Knockout bracket ---------------- */
@@ -1202,10 +1305,20 @@ function slotDescribe(token){
   return t;
 }
 /* Probability distribution over the teams that could fill a slot token.
-   Returns a Map(team -> probability 0..1). Recurses through W/L references. */
+   Returns a Map(team -> probability 0..1). Recurses through W/L references.
+   Memoized by token (invalidated when probs or sim picks change) — the whole-
+   tournament odds table calls this for every knockout slot, so caching matters. */
+let _slotDistMemo = new Map();
+function clearSlotMemo(){ _slotDistMemo = new Map(); }
 function slotDist(token, depth){
-  depth = depth||0;
   const t = String(token||"").trim();
+  const hit = _slotDistMemo.get(t);
+  if(hit) return hit;                       // callers treat the returned Map as read-only
+  const dist = _slotDist(t, depth||0);
+  _slotDistMemo.set(t, dist);
+  return dist;
+}
+function _slotDist(t, depth){
   const dist = new Map();
   const add = (team,p) => { if(team && p>0) dist.set(team,(dist.get(team)||0)+p); };
 
@@ -1257,6 +1370,35 @@ function slotCandidates(token){
   return arr.sort((a,b)=> b.pct-a.pct || a.team.localeCompare(b.team));
 }
 const fmtPct = p => p>=9.5 ? Math.round(p)+"%" : p.toFixed(1)+"%";
+
+/* Whole-tournament odds per team, derived from the same engine the simulator uses.
+   P(reach a round) = P(win the prior-round match): summing slotDist over a round's
+   winner tokens is exact because a team can only be in one match per round. */
+function tournamentOdds(){
+  const sumRange = (a,b) => { const o={}; for(let n=a;n<=b;n++) slotDist("W"+n).forEach((p,t)=> o[t]=(o[t]||0)+p); return o; };
+  const r16 = sumRange(73,88);   // win Round of 32  → reach Round of 16
+  const qf  = sumRange(89,96);   // win Round of 16  → reach Quarter-finals
+  const sf  = sumRange(97,100);  // win Quarter-final → reach Semi-finals
+  const fin = sumRange(101,102); // win Semi-final   → reach Final
+  const champ = {}; slotDist("W104").forEach((p,t)=> champ[t]=p);
+  const win={}, adv={};
+  Object.values(GROUP_PROBS).forEach(g=> Object.entries(g).forEach(([t,p])=>{ win[t]=p.p1; adv[t]=(adv[t]||0)+p.p1+p.p2; }));
+  Object.entries(THIRD_QUAL).forEach(([t,p])=> adv[t]=(adv[t]||0)+p);
+  const teams=new Set([...Object.keys(adv), ...Object.keys(champ)]);
+  return [...teams].map(t=>{
+    const a = Math.min(1, adv[t]||0);
+    // Clamp each round ≤ the previous so the row is always monotonic on screen
+    // (independent Monte-Carlo runs + the best-third approximation can otherwise
+    // leave a sub-percent inconsistency for a borderline team).
+    const R16 = Math.min(r16[t]||0, a);
+    const QF  = Math.min(qf[t]||0, R16);
+    const SF  = Math.min(sf[t]||0, QF);
+    const FIN = Math.min(fin[t]||0, SF);
+    const CH  = Math.min(champ[t]||0, FIN);
+    return { team:t, elo:eloOf(t), spanish:SPANISH_TEAMS.has(t),
+      win:win[t]||0, adv:a, r16:R16, qf:QF, sf:SF, fin:FIN, champ:CH };
+  }).sort((a,b)=> b.champ-a.champ || b.adv-a.adv || b.elo-a.elo);
+}
 
 // Country flag emoji for the teams in the tournament; placeholders get none.
 const FLAGS = {
@@ -1422,6 +1564,7 @@ function renderAll(){
   else if(currentView==="watch") renderWatch(now);
   else if(currentView==="groups") renderGroups();
   else if(currentView==="bracket") renderBracket();
+  else if(currentView==="odds") renderOdds();
   tickCountdowns();
 }
 
@@ -1430,11 +1573,36 @@ function setData(raw, source){
   MATCHES = normalize(raw);
   assignKnockoutNumbers();
   computeGroupProbs();         // qualification odds for the knockout simulator
+  pruneStaleOverrides();       // drop saved sim picks for slots results have now decided
   SOURCE = source;
   buildControls();
   restoreControlSelection();   // keep dropdowns in sync with active filters after a rebuild
   updateSourceBadge();
   renderAll();
+}
+// Remove simulator picks whose slot is now settled by an actual result (e.g. a group
+// finished, or a knockout tie was played) — keeps restored/legacy picks honest.
+function pruneStaleOverrides(){
+  Object.keys(SIM_OVERRIDES).forEach(t=>{
+    let dead=false, m=/^([12])([A-L])$/.exec(t);
+    if(m){ if(groupComplete("Group "+m[2])) dead=true; }
+    else if((m=/^([WL])(\d+)$/.exec(t))){ const src=KO_BY_NUM[+m[2]]; if(src && src.ft && src.ft[0]!==src.ft[1]) dead=true; }
+    if(dead) delete SIM_OVERRIDES[t];
+  });
+  clearSlotMemo();
+}
+/* ---------------- Persistence (filters, view, simulator picks) ---------------- */
+function saveState(){
+  try{ localStorage.setItem("wc-state", JSON.stringify({picks:SIM_OVERRIDES, filters, view:currentView})); }catch(e){}
+}
+function loadState(){
+  let st; try{ st=JSON.parse(localStorage.getItem("wc-state")||"null"); }catch(e){}
+  if(!st || typeof st!=="object") return;
+  if(st.filters && typeof st.filters==="object") Object.assign(filters, st.filters);
+  if(typeof st.view==="string" && ["matches","watch","groups","bracket","odds"].includes(st.view)) currentView=st.view;
+  if(st.picks && typeof st.picks==="object"){
+    Object.entries(st.picks).forEach(([tok,team])=>{ if(typeof team==="string") SIM_OVERRIDES[tok]=team; });
+  }
 }
 // buildControls() resets the <select> elements; re-apply the active filter values so
 // the Stage/Date dropdowns don't silently fall back to "All" after a refresh/live load.
@@ -1521,6 +1689,8 @@ function activateTab(tab, focus){
   el("view-watch").classList.toggle("hide",currentView!=="watch");
   el("view-groups").classList.toggle("hide",currentView!=="groups");
   el("view-bracket").classList.toggle("hide",currentView!=="bracket");
+  el("view-odds").classList.toggle("hide",currentView!=="odds");
+  saveState();
   renderAll();
   if(focus) tab.focus();
 }
@@ -1549,7 +1719,7 @@ function wireEvents(){
   el("matchBody").addEventListener("click",e=>{
     if(e.target.closest(".sim-reset")){            // clear all simulated participants
       for(const k in SIM_OVERRIDES) delete SIM_OVERRIDES[k];
-      renderAll(); return;
+      clearSlotMemo(); saveState(); renderAll(); return;
     }
     if(e.target.closest(".sim-select,.sim-pick")) return; // interacting with the simulator
     if(window.getSelection && String(window.getSelection())) return; // don't toggle on text selection
@@ -1570,19 +1740,25 @@ function wireEvents(){
     // stale/programmatic values); empty clears the override.
     if(sel.value && slotCandidates(tok).some(c=>c.team===sel.value)) SIM_OVERRIDES[tok]=sel.value;
     else delete SIM_OVERRIDES[tok];
-    renderAll();
+    clearSlotMemo(); saveState(); renderAll();
   });
-  el("fStage").addEventListener("change",e=>{filters.stage=e.target.value; renderMatches(Date.now());});
-  el("fDate").addEventListener("change",e=>{filters.date=e.target.value; renderMatches(Date.now());});
-  el("fSearch").addEventListener("input",e=>{filters.search=e.target.value.trim(); renderMatches(Date.now());});
-  el("fHideFinished").addEventListener("change",e=>{filters.hideFinished=e.target.checked; renderMatches(Date.now());});
+  el("fStage").addEventListener("change",e=>{filters.stage=e.target.value; saveState(); renderMatches(Date.now());});
+  el("fDate").addEventListener("change",e=>{filters.date=e.target.value; saveState(); renderMatches(Date.now());});
+  el("fSearch").addEventListener("input",e=>{filters.search=e.target.value.trim(); saveState(); renderMatches(Date.now());});
+  el("fHideFinished").addEventListener("change",e=>{filters.hideFinished=e.target.checked; saveState(); renderMatches(Date.now());});
   el("quickChips").addEventListener("click",e=>{
     const c=e.target.closest(".chip"); if(!c) return;
     document.querySelectorAll("#quickChips .chip").forEach(x=>{
       x.classList.remove("active"); x.setAttribute("aria-pressed","false");
     });
     c.classList.add("active"); c.setAttribute("aria-pressed","true");
-    filters.quick=c.dataset.q; renderMatches(Date.now());
+    filters.quick=c.dataset.q; saveState(); renderMatches(Date.now());
+  });
+  el("oddsTable").addEventListener("click",e=>{
+    const th=e.target.closest("th[data-key]"); if(!th) return;
+    const k=th.dataset.key;
+    oddsSort = (oddsSort.key===k) ? {key:k, dir:-oddsSort.dir} : {key:k, dir:k==="team"?1:-1};
+    renderOdds();
   });
   el("tzSelect").addEventListener("change",e=>{
     const opt=e.target.selectedOptions[0];
@@ -1592,11 +1768,13 @@ function wireEvents(){
 }
 
 /* ---------------- Init ---------------- */
+loadState();                   // restore saved filters, view and simulator picks
 syncThemeButton();             // match button to theme set pre-paint
 buildTzControl();
-setData(EMBEDDED, "embedded"); // instant render
+setData(EMBEDDED, "embedded"); // instant render (honours restored filters/picks)
 updateTzLabels();
 wireEvents();
+activateTab(el("tab-"+currentView) || el("tab-matches"), false);  // reflect restored view
 loadRatings();                 // try to upgrade Elo ratings from worldcup2026_data.json
 loadLive();                    // try to upgrade to live data
 setInterval(tickCountdowns, 1000);
