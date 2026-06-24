@@ -740,6 +740,8 @@ let currentView = "matches";
 const expanded = new Set();   // ids of match rows whose detail panel is open
 let GROUP_PROBS = {};         // group -> { team: {p1,p2,p3} } from Monte-Carlo sim
 let GROUP_SIG = {};           // group -> signature of played results (cache key)
+let THIRD_QUAL = {};          // team -> P(3rd in group AND a top-8 qualifying third)
+let THIRD_SIG = "";           // signature of all group results (cache key for THIRD_QUAL)
 const SIM_OVERRIDES = {};     // knockout slot token -> simulated team (user pick)
 
 /* ---------------- Helpers ---------------- */
@@ -1022,13 +1024,11 @@ function poisson(lambda){
   do{ k++; p*=Math.random(); }while(p>L);
   return k-1;
 }
-function simulateGroup(grp, iters){
+const koLambda = s => 0.35 + 0.55*s;
+// Build a group's fixed (played) table + strengths once, for reuse across iterations.
+function buildGroupModel(grp){
   const ms = MATCHES.filter(m=>m.group===grp);
   const teams = [...new Set(ms.flatMap(m=>[m.team1,m.team2]))];
-  const counts = {}; teams.forEach(t=>counts[t]={p1:0,p2:0,p3:0});
-  if(!teams.length) return counts;
-
-  // Fixed contribution from already-played matches.
   const base = {}; teams.forEach(t=>base[t]={Pts:0,GD:0,GF:0});
   const unplayed = [];
   ms.forEach(m=>{
@@ -1037,23 +1037,32 @@ function simulateGroup(grp, iters){
     a.GF+=ga; b.GF+=gb; a.GD+=ga-gb; b.GD+=gb-ga;
     if(ga>gb) a.Pts+=3; else if(gb>ga) b.Pts+=3; else { a.Pts++; b.Pts++; }
   });
-
   // Strength = points-per-game so far, with a mild prior so winless teams aren't 0.
   const cur = computeStandings(grp), strength = {};
   cur.forEach(r=> strength[r.team]=(r.Pts+1.0)/(r.P+1));
   teams.forEach(t=>{ if(strength[t]==null) strength[t]=1; });
-  const lambda = s => 0.35 + 0.55*s;
-
+  return {grp, teams, base, unplayed, strength};
+}
+// Simulate one realization of a group's remaining matches → final standings order.
+function simulateGroupOnce(model){
+  const {teams, base, unplayed, strength} = model;
+  const tbl={}; teams.forEach(t=>{const r=base[t]; tbl[t]={team:t,Pts:r.Pts,GD:r.GD,GF:r.GF};});
+  unplayed.forEach(m=>{
+    const a=tbl[m.team1], b=tbl[m.team2];
+    const ga=poisson(koLambda(strength[m.team1])), gb=poisson(koLambda(strength[m.team2]));
+    a.GF+=ga; b.GF+=gb; a.GD+=ga-gb; b.GD+=gb-ga;
+    if(ga>gb) a.Pts+=3; else if(gb>ga) b.Pts+=3; else { a.Pts++; b.Pts++; }
+  });
+  return Object.values(tbl).sort((x,y)=> y.Pts-x.Pts || y.GD-x.GD || y.GF-x.GF || x.team.localeCompare(y.team));
+}
+function simulateGroup(grp, iters){
+  const model = buildGroupModel(grp);
+  const {teams, unplayed} = model;
+  const counts = {}; teams.forEach(t=>counts[t]={p1:0,p2:0,p3:0});
+  if(!teams.length) return counts;
   const N = unplayed.length ? iters : 1;   // nothing left to sim → table is fixed
   for(let it=0; it<N; it++){
-    const tbl={}; teams.forEach(t=>{const r=base[t]; tbl[t]={team:t,Pts:r.Pts,GD:r.GD,GF:r.GF};});
-    unplayed.forEach(m=>{
-      const a=tbl[m.team1], b=tbl[m.team2];
-      const ga=poisson(lambda(strength[m.team1])), gb=poisson(lambda(strength[m.team2]));
-      a.GF+=ga; b.GF+=gb; a.GD+=ga-gb; b.GD+=gb-ga;
-      if(ga>gb) a.Pts+=3; else if(gb>ga) b.Pts+=3; else { a.Pts++; b.Pts++; }
-    });
-    const order=Object.values(tbl).sort((x,y)=> y.Pts-x.Pts || y.GD-x.GD || y.GF-x.GF || x.team.localeCompare(y.team));
+    const order = simulateGroupOnce(model);
     if(order[0]) counts[order[0].team].p1++;
     if(order[1]) counts[order[1].team].p2++;
     if(order[2]) counts[order[2].team].p3++;
@@ -1061,17 +1070,37 @@ function simulateGroup(grp, iters){
   const out={}; teams.forEach(t=>out[t]={p1:counts[t].p1/N, p2:counts[t].p2/N, p3:counts[t].p3/N});
   return out;
 }
+// Joint cross-group sim: each iteration ranks all 12 third-placed teams by FIFA's
+// criteria (Pts, GD, GF) and keeps the best 8 — so THIRD_QUAL[team] = P(team finishes
+// 3rd in its group AND is among the eight thirds that actually advance to the R32.
+function computeThirdQual(iters){
+  const groups=[...new Set(MATCHES.filter(m=>m.isGroup).map(m=>m.group))];
+  if(!groups.length){ THIRD_QUAL={}; return; }
+  const models=groups.map(buildGroupModel);
+  const N = models.some(m=>m.unplayed.length) ? iters : 1;
+  const qual={};
+  for(let it=0; it<N; it++){
+    const thirds=[];
+    models.forEach(model=>{ const order=simulateGroupOnce(model); if(order[2]) thirds.push(order[2]); });
+    thirds.sort((a,b)=> b.Pts-a.Pts || b.GD-a.GD || b.GF-a.GF);
+    thirds.slice(0,8).forEach(t=>{ qual[t.team]=(qual[t.team]||0)+1; });
+  }
+  const out={}; Object.keys(qual).forEach(t=> out[t]=qual[t]/N);
+  THIRD_QUAL=out;
+}
 // Re-simulate only the groups whose played results changed since last time, so a
 // live refresh that didn't alter any score costs ~0 instead of re-running all 12.
 function computeGroupProbs(){
-  const next={}, nextSig={};
+  const next={}, nextSig={}; let combined="";
   [...new Set(MATCHES.filter(m=>m.isGroup).map(m=>m.group))].forEach(grp=>{
     const sig = MATCHES.filter(m=>m.group===grp)
       .map(m=> m.ft ? `${m.team1} ${m.ft[0]}-${m.ft[1]} ${m.team2}` : "").join("|");
     next[grp] = (GROUP_SIG[grp]===sig && GROUP_PROBS[grp]) ? GROUP_PROBS[grp] : simulateGroup(grp, 2500);
-    nextSig[grp] = sig;
+    nextSig[grp] = sig; combined += grp+":"+sig+";";
   });
   GROUP_PROBS = next; GROUP_SIG = nextSig;
+  // Third-place qualification is cross-group, so cache it on the combined signature.
+  if(THIRD_SIG!==combined){ computeThirdQual(2500); THIRD_SIG=combined; }
 }
 
 function renderGroups(){
@@ -1165,7 +1194,13 @@ function slotDist(token, depth){
   }
   if(/^3[A-L]/.test(t)){   // best-third slot drawn from one of several groups
     const groups=(t.slice(1).match(/[A-L]/g)||[]);
-    groups.forEach(g=>{
+    // Weight by P(3rd AND a top-8 qualifying third), normalized across the listed
+    // groups — so thirds that won't actually advance drop out of the candidate list.
+    const teamsOf = g => [...new Set(MATCHES.filter(x=>x.group==="Group "+g).flatMap(x=>[x.team1,x.team2]))];
+    let mass=0; const tmp=[];
+    groups.forEach(g=> teamsOf(g).forEach(team=>{ const p=THIRD_QUAL[team]||0; if(p>0){ tmp.push([team,p]); mass+=p; } }));
+    if(mass>0){ tmp.forEach(([team,p])=> add(team, p/mass)); return dist; }
+    groups.forEach(g=>{   // fallback (no qualification data yet): flat 3rd-place odds
       const probs=GROUP_PROBS["Group "+g];
       if(probs) Object.entries(probs).forEach(([team,p])=> add(team, p.p3/groups.length));
     });
