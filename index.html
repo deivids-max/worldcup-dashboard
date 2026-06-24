@@ -113,11 +113,13 @@
   .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:24px 0}
   .kpi{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
     padding:18px 20px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+    display:flex; flex-direction:column;
     transition:transform var(--ease),box-shadow var(--ease)}
   .kpi:hover{transform:translateY(-2px); box-shadow:var(--shadow-lg)}
   .kpi .label{color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.6px; font-weight:700}
-  .kpi .value{font-size:28px; font-weight:800; margin-top:8px; line-height:1.1; letter-spacing:-.5px}
-  .kpi .sub{color:var(--muted); font-size:12.5px; margin-top:5px}
+  .kpi .value{font-size:28px; font-weight:800; margin-top:8px; line-height:1.1; letter-spacing:-.5px;
+    font-variant-numeric:tabular-nums}
+  .kpi .sub{color:var(--muted); font-size:12.5px; margin-top:auto; padding-top:5px}
   .kpi.accent{background:linear-gradient(135deg,#0b3d6b,#11598f); color:#fff; border:none;
     box-shadow:var(--shadow-lg)}
   .kpi.accent::after{content:""; position:absolute; right:-30px; top:-30px; width:120px; height:120px;
@@ -195,7 +197,7 @@
   /* Expandable match detail */
   tr.match{cursor:pointer}
   .kick-cell{display:flex; align-items:flex-start; gap:7px}
-  .caret{color:var(--muted); font-size:11px; line-height:1; margin-top:3px;
+  .caret{color:var(--muted); font-size:13px; line-height:1; margin-top:2px;
     transition:transform .15s ease; flex:0 0 auto}
   tr.match.open .caret{transform:rotate(90deg); color:var(--brand)}
   tr.match:focus-visible{outline:none}
@@ -203,7 +205,7 @@
   tr.match:focus-visible td{background:color-mix(in srgb,var(--brand-2) 8%,var(--panel))}
   .sim-reset:focus-visible,.sim-select:focus-visible{outline:none; box-shadow:var(--ring)}
   tr.detail-row td{padding:0; background:#fbfcfe; border-bottom:1px solid var(--line)}
-  .detail-wrap{padding:14px 18px 16px; display:grid;
+  .detail-wrap{padding:14px 14px 16px; display:grid;
     grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:20px}
   .detail-h{font-size:11px; text-transform:uppercase; letter-spacing:.5px;
     color:var(--muted); font-weight:700; margin:0 0 9px}
@@ -226,7 +228,7 @@
   @media (max-width:700px){ .detail-wrap{grid-template-columns:1fr; gap:14px} }
 
   /* Knockout participant simulator */
-  .sim-block{border-top:1px solid var(--line); padding:14px 18px 16px}
+  .sim-block{border-top:1px solid var(--line); padding:14px 14px 16px}
   .sim-note{font-style:normal; font-weight:600; text-transform:none; letter-spacing:0;
     color:var(--muted); margin-left:8px; font-size:11px}
   .sim-reset{cursor:pointer; border:1px solid var(--line-strong); background:var(--panel);
@@ -235,16 +237,19 @@
   .sim-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
   @media (max-width:700px){ .sim-grid{grid-template-columns:1fr} }
   .sim-slot-h{font-weight:700; font-size:12.5px; margin-bottom:9px}
-  .cand{display:grid; grid-template-columns:1fr 90px auto; align-items:center; gap:10px;
+  .sim-approx{color:var(--muted); font-weight:600; cursor:help}
+  /* Fixed name track + flexible bar so the bars line up and stay comparable
+     across BOTH slots (each slot is its own grid, so the tracks must match). */
+  .cand{display:grid; grid-template-columns:92px 1fr 40px; align-items:center; gap:10px;
     font-size:12.5px; margin-bottom:6px}
-  .cand-nm{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .cand-nm{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0}
   .cand.es .cand-nm{color:var(--high-ink)}
   .cand.chosen{background:var(--good-bg); border-radius:6px; padding:2px 6px; margin-left:-6px}
-  .cand-bar{height:7px; background:var(--line); border-radius:999px; overflow:hidden}
+  .cand-bar{height:8px; background:var(--line); border-radius:999px; overflow:hidden}
   .cand-bar i{display:block; height:100%; background:var(--brand-2); border-radius:999px}
   .cand.chosen .cand-bar i{background:var(--good)}
   .cand-pct{font-variant-numeric:tabular-nums; font-weight:700; color:var(--muted);
-    text-align:right; min-width:42px}
+    text-align:right}
   .sim-pick{display:flex; align-items:center; gap:8px; margin-top:10px; font-size:12px;
     font-weight:600; color:var(--muted)}
   .sim-pick select{min-width:0; flex:1}
@@ -734,6 +739,7 @@ const filters = { stage:"all", date:"all", search:"", quick:"all", hideFinished:
 let currentView = "matches";
 const expanded = new Set();   // ids of match rows whose detail panel is open
 let GROUP_PROBS = {};         // group -> { team: {p1,p2,p3} } from Monte-Carlo sim
+let GROUP_SIG = {};           // group -> signature of played results (cache key)
 const SIM_OVERRIDES = {};     // knockout slot token -> simulated team (user pick)
 
 /* ---------------- Helpers ---------------- */
@@ -843,7 +849,7 @@ function renderMatches(now){
     const t2 = m.isGroup ? m.team2 : resolveSlot(m.team2).label;
     const aria = `${t1} versus ${t2}, ${m.isGroup?m.group:m.round}. ${isOpen?"Collapse":"Expand"} match details`;
     html += `<tr class="${cls}" data-id="${esc(m.id)}" role="button" tabindex="0" aria-expanded="${isOpen?"true":"false"}" aria-label="${esc(aria)}">
-      <td><div class="kick-cell"><span class="caret" aria-hidden="true">▸</span>
+      <td><div class="kick-cell"><span class="caret" aria-hidden="true">›</span>
         <div><div class="time">${fmtTime(m.kickoff)}</div><div class="tz">${tzAbbr(m.kickoff)}</div></div></div></td>
       <td class="teams">${matchTeamHTML(m,1)} <span class="vs">v</span> ${matchTeamHTML(m,2)}</td>
       <td><span class="stage-tag">${esc(m.isGroup?m.group:m.round)}</span></td>
@@ -874,7 +880,7 @@ function matchDetailHTML(m, now){
     // toward the centre divider (team1 names on the right edge, team2 on the left).
     const goalRow = (g, side) => {
       const tags = `${g.pen?'<span class="gtag">pen</span>':''}${g.og?'<span class="gtag">o.g.</span>':''}`;
-      const min = g.minuteLabel ? esc(g.minuteLabel)+"&prime;" : "—";
+      const min = g.minuteLabel ? esc(g.minuteLabel)+"&prime;" : "&ndash;";
       const who = `<span class="who"><span aria-hidden="true">⚽</span> ${esc(g.name||"Goal")} ${tags}</span>`;
       const mn  = `<span class="min">${min}</span>`;
       return `<div class="goal">${side==="left" ? who+mn : mn+who}</div>`;
@@ -952,8 +958,12 @@ function simBlockHTML(m){
       : `<p class="detail-note">No candidates available yet.</p>`;
     const opts = `<option value="">— leave open —</option>` +
       cands.map(c=>`<option value="${esc(c.team)}"${c.team===chosen?' selected':''}>${esc(c.team)} · ${fmtPct(c.pct)}</option>`).join("");
+    // Honest caveats: best-third and winner/loser odds are approximations.
+    const note = /^3[A-L]/.test(tok) ? "Approximate: FIFA's best-third allocation isn't modelled exactly."
+      : /^[WL]\d/.test(tok) ? "Reachability odds — match outcomes aren't modelled, so winner and loser odds are equal."
+      : "";
     return `<div class="sim-slot">
-      <div class="sim-slot-h">${esc(slotDescribe(tok))}</div>
+      <div class="sim-slot-h"${note?` title="${esc(note)}"`:""}>${esc(slotDescribe(tok))}${note?' <span class="sim-approx" aria-hidden="true">≈</span>':""}</div>
       ${bars}
       <label class="sim-pick">Lock in:
         <select class="sim-select" data-token="${esc(tok)}" aria-label="Simulate participant for ${esc(slotDescribe(tok))}">${opts}</select></label>
@@ -962,7 +972,7 @@ function simBlockHTML(m){
 
   return `<div class="sim-block">
     <p class="detail-h">Simulate participants
-      <span class="sim-note">odds from current group form${anySim?` · <button type="button" class="sim-reset">reset all</button>`:""}</span></p>
+      <span class="sim-note">approximate odds from current group form${anySim?` · <button type="button" class="sim-reset">reset all</button>`:""}</span></p>
     <div class="sim-grid">${cols}</div>
   </div>`;
 }
@@ -1051,11 +1061,17 @@ function simulateGroup(grp, iters){
   const out={}; teams.forEach(t=>out[t]={p1:counts[t].p1/N, p2:counts[t].p2/N, p3:counts[t].p3/N});
   return out;
 }
+// Re-simulate only the groups whose played results changed since last time, so a
+// live refresh that didn't alter any score costs ~0 instead of re-running all 12.
 function computeGroupProbs(){
-  GROUP_PROBS={};
+  const next={}, nextSig={};
   [...new Set(MATCHES.filter(m=>m.isGroup).map(m=>m.group))].forEach(grp=>{
-    GROUP_PROBS[grp]=simulateGroup(grp, 2500);
+    const sig = MATCHES.filter(m=>m.group===grp)
+      .map(m=> m.ft ? `${m.team1} ${m.ft[0]}-${m.ft[1]} ${m.team2}` : "").join("|");
+    next[grp] = (GROUP_SIG[grp]===sig && GROUP_PROBS[grp]) ? GROUP_PROBS[grp] : simulateGroup(grp, 2500);
+    nextSig[grp] = sig;
   });
+  GROUP_PROBS = next; GROUP_SIG = nextSig;
 }
 
 function renderGroups(){
@@ -1463,7 +1479,10 @@ function wireEvents(){
   el("matchBody").addEventListener("change",e=>{
     const sel=e.target.closest("select.sim-select"); if(!sel) return;
     const tok=sel.dataset.token;
-    if(sel.value) SIM_OVERRIDES[tok]=sel.value; else delete SIM_OVERRIDES[tok];
+    // Only accept a value that's an actual candidate for this slot (guards against
+    // stale/programmatic values); empty clears the override.
+    if(sel.value && slotCandidates(tok).some(c=>c.team===sel.value)) SIM_OVERRIDES[tok]=sel.value;
+    else delete SIM_OVERRIDES[tok];
     renderAll();
   });
   el("fStage").addEventListener("change",e=>{filters.stage=e.target.value; renderMatches(Date.now());});
