@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(node -e ' *)",
+      "Bash(npm --version)",
+      "Bash(npx --version)",
+      "Read(//c/Users/Deivids/.cache/**)",
+      "Read(//c/Program Files/Google/Chrome/Application/**)",
+      "Read(//c/Program Files \\(x86\\)/Microsoft/Edge/Application/**)"
+    ]
+  }
+}
