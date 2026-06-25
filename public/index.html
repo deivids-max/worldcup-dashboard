@@ -422,6 +422,17 @@
   .tp-sc{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:700}
   .tp-res{display:inline-block; min-width:14px; font-weight:800; margin-right:var(--sp-1)}
   .tp-W{color:var(--ink)} .tp-L{color:var(--muted)} .tp-D{color:var(--muted)}
+
+  /* ===== NEW (Today in World Cup history) banner ===== */
+  .hist{display:flex; align-items:flex-start; gap:var(--sp-3); margin:0 0 var(--sp-6);
+    padding:var(--sp-3) var(--sp-4); border:1px solid var(--line-strong); border-left:5px solid var(--red); background:var(--panel)}
+  .hist-txt{flex:1; font-size:var(--fs-sm)}
+  .hist-txt b{display:block; text-transform:uppercase; letter-spacing:.08em; font-size:var(--fs-2xs);
+    color:var(--muted); font-weight:700; margin-bottom:2px}
+  .hist-x{cursor:pointer; background:none; border:none; color:var(--muted); font-size:var(--fs-lg);
+    line-height:1; padding:0 var(--sp-1); flex:0 0 auto}
+  .hist-x:hover{color:var(--ink)}
+  .hist-x:focus-visible{outline:none; box-shadow:var(--ring)}
 </style>
 <script>
   /* Set theme before first paint to avoid a flash of the wrong theme. */
@@ -456,6 +467,9 @@
 <div class="wrap">
 
   <section class="kpis" id="kpis"></section>
+
+  <!-- ===== NEW (Today in World Cup history): dismissible "on this day" fact banner ===== -->
+  <div id="histBanner" class="hist hide" role="note" aria-label="On this day in World Cup history"></div>
 
   <div class="tabs" role="tablist" aria-label="Dashboard views">
     <button type="button" class="tab active" role="tab" id="tab-matches" data-view="matches" aria-selected="true" aria-controls="view-matches" tabindex="0">Matches</button>
@@ -1405,12 +1419,64 @@ function closeTeamProfile(){
   if(_tmLastFocus && _tmLastFocus.focus) _tmLastFocus.focus();
 }
 
+/* ===== NEW (Today in World Cup history): curated, date-verified facts; no external data ===== */
+const WC_HISTORY = {
+  "06-11":"2010 — Siphiwe Tshabalala lit up the South Africa World Cup opener with a thunderbolt in a 1-1 draw with Mexico.",
+  "06-12":"2014 — Neymar scored twice as hosts Brazil opened their home World Cup with a 3-1 win over Croatia.",
+  "06-13":"2014 — Robin van Persie's flying diving header sparked the Netherlands' stunning 5-1 demolition of holders Spain.",
+  "06-14":"2018 — Russia kicked off their home World Cup in style, thrashing Saudi Arabia 5-0 in the opener.",
+  "06-16":"1982 — Algeria stunned reigning European champions West Germany 2-1, the first African win over a European side at a World Cup.",
+  "06-17":"1970 — Italy beat West Germany 4-3 after a wild extra time in the semifinal forever known as the 'Game of the Century'.",
+  "06-18":"2002 — Ahn Jung-hwan's golden goal sent co-hosts South Korea past Italy 2-1 in a famous last-16 upset.",
+  "06-19":"1938 — Italy beat Hungary 4-2 in Paris to retain the World Cup, the first team to win back-to-back titles.",
+  "06-21":"1970 — Brazil dazzled Italy 4-1 to win a record third World Cup, with Pele and Carlos Alberto's iconic team goal.",
+  "06-22":"1986 — Maradona beat England with the 'Hand of God' and minutes later the 'Goal of the Century' in a 2-1 win.",
+  "06-23":"1990 — Roger Milla scored twice, robbing keeper Higuita for one, as Cameroon beat Colombia 2-1 to reach the quarters.",
+  "06-25":"1978 — Mario Kempes inspired hosts Argentina to a 3-1 extra-time win over the Netherlands for their first World Cup.",
+  "06-26":"2002 — Ronaldo's 49th-minute goal beat Turkey 1-0, sending Brazil into the World Cup final on the way to a record fifth title.",
+  "06-27":"2010 — Frank Lampard's shot bounced a foot over the line v Germany but went ungiven, hastening goal-line technology.",
+  "06-28":"2014 — James Rodriguez's chest-and-volley v Uruguay won the Puskas Award and Colombia a 2-0 last-16 win.",
+  "06-29":"1986 — Argentina beat West Germany 3-2 in the final, Burruchaga netting the late winner from a Maradona pass.",
+  "06-30":"2002 — Ronaldo scored twice against Germany as Brazil won a record fifth World Cup with a 2-0 final victory.",
+  "07-02":"2010 — Luis Suarez handballed on the line v Ghana, was sent off, Gyan missed the penalty, and Uruguay won the shootout.",
+  "07-03":"2010 — Germany dismantled Argentina 4-0 in the quarterfinal in Cape Town.",
+  "07-04":"1990 — West Germany beat England 4-3 on penalties in Turin, the semifinal of Gazza's tears, after a 1-1 draw.",
+  "07-05":"1982 — Paolo Rossi's hat-trick knocked out Brazil 3-2 in Barcelona, one of the World Cup's greatest games.",
+  "07-06":"2010 — The Netherlands beat Uruguay 3-2 to reach their first World Cup final in 32 years.",
+  "07-07":"1974 — West Germany beat the Netherlands 2-1 in the final, Gerd Muller's winner denying Cruyff's 'Total Football'.",
+  "07-08":"2014 — Germany humiliated hosts Brazil 7-1 in the semifinal, the 'Mineirazo', scoring five in the first 29 minutes.",
+  "07-09":"2006 — Italy beat France on penalties in the final after Zidane's extra-time headbutt on Materazzi and red card.",
+  "07-11":"2010 — Andres Iniesta's late extra-time goal beat the Netherlands 1-0 to win Spain their first World Cup.",
+  "07-12":"1998 — Zinedine Zidane scored twice as France beat Brazil 3-0 to win their first World Cup on home soil.",
+  "07-13":"2014 — Mario Gotze's extra-time volley beat Argentina 1-0 to win Germany a fourth World Cup.",
+  "07-15":"2018 — France beat Croatia 4-2 in a thrilling final in Moscow to claim their second World Cup.",
+  "07-16":"1950 — Uruguay stunned Brazil 2-1 at the Maracana to win the World Cup before ~200,000 fans (the 'Maracanazo').",
+  "07-17":"1994 — Brazil beat Italy on penalties for a fourth title after Roberto Baggio skied the decisive kick over the bar.",
+  "07-19":"1966 — Debutants North Korea shocked Italy 1-0 at Ayresome Park, one of the World Cup's greatest upsets.",
+  "12-18":"2022 — Argentina beat France on penalties after a 3-3 classic; Messi finally lifted the World Cup, Mbappe hit a hat-trick."
+};
+function renderHistory(){
+  const banner = el("histBanner");
+  const key = dayKeyOf(new Date()).slice(5);   // MM-DD in the active display zone
+  const fact = WC_HISTORY[key];
+  let dismissed=null; try{ dismissed=localStorage.getItem("wc-hist-dismissed"); }catch(e){}
+  if(!fact || dismissed===key){ banner.classList.add("hide"); banner.innerHTML=""; return; }
+  banner.innerHTML = `<div class="hist-txt"><b>On this day in World Cup history</b>${esc(fact)}</div>
+    <button type="button" class="hist-x" id="histX" aria-label="Dismiss this fact">&times;</button>`;
+  banner.classList.remove("hide");
+  el("histX").addEventListener("click", ()=>{
+    try{ localStorage.setItem("wc-hist-dismissed", key); }catch(e){}
+    banner.classList.add("hide");
+  });
+}
+
 /* ---------------- Init ---------------- */
 syncThemeButton();             // match button to theme set pre-paint
 buildTzControl();
 setData(EMBEDDED, "embedded"); // instant render
 updateTzLabels();
 wireEvents();
+renderHistory();               // NEW: show today's "on this day" World Cup fact
 loadLive();                    // try to upgrade to live data
 setInterval(tickCountdowns, 1000);
 setInterval(renderAll, 60000); // refresh statuses/highlights each minute
