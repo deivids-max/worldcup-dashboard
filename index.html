@@ -21,8 +21,9 @@
     --brand:#0a0a0a; --brand-2:#0a0a0a; --accent:#e2231a;
     --today:#f2f2f2; --today-line:#0a0a0a;
     --live:#e2231a; --soon:#0a0a0a;
-    --crit:#e2231a; --high:#0a0a0a; --med:#737373; --std:#a3a3a3;
-    --high-ink:#e2231a;   /* the red accent doubles as the Spanish-team highlight */
+    --crit:#e2231a; --high:#0a0a0a; --med:#737373; --std:#6b6b6b;
+    --high-ink:#c81e15;   /* darker red: stays AA-legible on the warn-bg tint (Spanish-team highlight) */
+    --accent-on-ink:#ff5b52;   /* red that keeps AA contrast on the inverted (--ink) accent card */
     --good:#0a0a0a; --good-bg:#f2f2f2; --warn-bg:#fdeceb;
     --shadow-sm:none; --shadow:none; --shadow-lg:none;
     --ring:0 0 0 2px var(--ink);
@@ -38,12 +39,13 @@
   :root[data-theme="dark"]{
     --bg:#0b0b0b; --panel:#111111; --ink:#f5f5f5; --muted:#8f8f8f;
     --line:#272727; --line-strong:#f5f5f5;
-    --red:#ff453a;
+    --red:#ff453a; --red-fill:#d11a10;   /* --red-fill sits behind white text (badges/trophy) at AA */
     --brand:#f5f5f5; --brand-2:#f5f5f5; --accent:#ff453a;
     --today:#1b1b1b; --today-line:#f5f5f5;
     --live:#ff453a; --soon:#f5f5f5;
-    --crit:#ff453a; --high:#f5f5f5; --med:#8f8f8f; --std:#5e5e5e;
+    --crit:#ff453a; --high:#f5f5f5; --med:#8f8f8f; --std:#8f8f8f;
     --high-ink:#ff6b61;
+    --accent-on-ink:#d11a10;   /* red legible on the inverted (light) accent card in dark mode */
     --good:#f5f5f5; --good-bg:#1b1b1b; --warn-bg:#2a1413;
     --ring:0 0 0 2px var(--ink);
   }
@@ -95,18 +97,19 @@
   .btn:focus-visible,.pill:focus-within{outline:none; box-shadow:var(--ring)}
 
   /* KPI cards — flat panels in a hairline grid, big tabular numerals */
-  .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin:var(--sp-6) 0;
-    border:1px solid var(--line-strong)}
-  .kpi{background:var(--panel); border-left:1px solid var(--line); border-radius:0;
+  /* gap:1px over a --line backdrop draws the cell dividers, so they stay correct
+     at 4/2/1 columns and across wrapped rows without per-child border math */
+  .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; margin:var(--sp-6) 0;
+    background:var(--line); border:1px solid var(--line-strong)}
+  .kpi{background:var(--panel); border-radius:0;
     padding:var(--sp-4) var(--sp-4) var(--sp-5); position:relative; overflow:hidden;
     display:flex; flex-direction:column; min-height:118px}
-  .kpi:first-child{border-left:none}
   .kpi .label{color:var(--muted); font-size:var(--fs-2xs); text-transform:uppercase; letter-spacing:.1em; font-weight:700}
   .kpi .value{font-size:var(--fs-4xl); font-weight:800; margin-top:var(--sp-2); line-height:.95; letter-spacing:-.03em;
     font-variant-numeric:tabular-nums}
   .kpi .sub{color:var(--muted); font-size:var(--fs-xs); margin-top:auto; padding-top:var(--sp-2)}
-  .kpi.accent{background:var(--ink); color:var(--panel); border-left:1px solid var(--ink)}
-  .kpi.accent .label{color:var(--red)}
+  .kpi.accent{background:var(--ink); color:var(--panel)}
+  .kpi.accent .label{color:var(--accent-on-ink)}
   .kpi.accent .sub{color:var(--panel); opacity:.6}
 
   /* Tabs — uppercase grotesk with a red active rule */
@@ -141,11 +144,10 @@
   #tzSelect{min-width:auto; height:auto; padding:2px var(--sp-1); border:1px solid currentColor; border-radius:0; font-size:var(--fs-xs);
     font-weight:700; background:transparent; color:var(--ink); cursor:pointer; text-transform:uppercase; letter-spacing:.04em}
   #tzSelect:focus{box-shadow:var(--ring)}
-  .chipset{display:flex; gap:0; flex-wrap:wrap; border:1px solid var(--line-strong)}
-  .chip{cursor:pointer; border:none; border-left:1px solid var(--line-strong); background:var(--panel); color:var(--ink);
+  .chipset{display:flex; gap:1px; flex-wrap:wrap; background:var(--line-strong); border:1px solid var(--line-strong)}
+  .chip{cursor:pointer; border:none; background:var(--panel); color:var(--ink);
     padding:0 var(--sp-4); height:38px; display:inline-flex; align-items:center; border-radius:0;
     font:inherit; font-size:var(--fs-xs); font-weight:700; text-transform:uppercase; letter-spacing:.05em; transition:background var(--ease),color var(--ease)}
-  .chip:first-child{border-left:none}
   .chip:hover{background:var(--today)}
   .chip.active{background:var(--ink); color:var(--panel)}
   .chip:focus-visible{outline:none; box-shadow:var(--ring); position:relative; z-index:1}
@@ -205,6 +207,7 @@
   .goals-col.right .goal{justify-content:flex-start}
   .goal .min{font-variant-numeric:tabular-nums; font-weight:700; color:var(--red); flex:0 0 auto}
   .goal .who{font-weight:600}
+  .gdot{color:var(--red); font-size:.62em; vertical-align:middle; margin-right:.1em}
   .gtag{font-size:var(--fs-3xs); font-weight:700; text-transform:uppercase; letter-spacing:.06em;
     color:var(--muted); border:1px solid var(--line-strong); border-radius:0; padding:1px var(--sp-1); margin-left:var(--sp-2)}
   .detail-note{margin:0; color:var(--muted); font-size:var(--fs-sm); font-style:normal}
@@ -212,9 +215,9 @@
 
   .badge{display:inline-block; font-size:var(--fs-3xs); font-weight:700; padding:2px var(--sp-2); border-radius:0;
     text-transform:uppercase; letter-spacing:.08em; white-space:nowrap; border:1px solid transparent}
-  .b-live{background:var(--live); color:#fff}
+  .b-live{background:var(--red-fill, var(--live)); color:#fff}
   .b-ft{background:transparent; color:var(--muted); border-color:var(--line-strong)}
-  .b-up{background:transparent; color:var(--ink); border-color:var(--line)}
+  .b-up{background:transparent; color:var(--ink); border-color:var(--muted)}
   .b-soon{background:var(--ink); color:var(--panel)}
   .b-today{background:transparent; color:var(--ink); border-color:var(--ink)}
 
@@ -270,8 +273,6 @@
   .bk-side + .bk-side{border-top:1px solid var(--line)}
   .bk-side .nm{font-weight:700; display:flex; align-items:center; gap:var(--sp-2); min-width:0}
   .bk-side .nm .lbl{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0}
-  .bk-side .fl{font-size:var(--fs-lg); line-height:1; flex:0 0 auto}
-  .bk-side .fl.ph-fl{color:var(--line); font-size:var(--fs-sm)}
   .bk-side.ph .nm{font-style:normal; color:var(--muted); font-weight:500}
   .bk-side.es{background:var(--warn-bg); box-shadow:inset 3px 0 0 var(--red)}
   .bk-side.es .nm{color:var(--high-ink)}
@@ -279,11 +280,11 @@
   .bk-side.win .nm{color:var(--ink)}
   .bk-side .sc{font-variant-numeric:tabular-nums; font-weight:800; color:var(--ink); flex:0 0 auto}
   .bk-meta{padding:var(--sp-2) var(--sp-3); border-top:1px solid var(--line); font-size:var(--fs-3xs); color:var(--muted);
-    display:flex; justify-content:space-between; gap:var(--sp-2); background:var(--today)}
+    display:flex; justify-content:space-between; gap:var(--sp-2); background:var(--panel)}
   .bk-meta .v{text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .final-card{border-color:var(--red); box-shadow:0 0 0 1px var(--red)}
   .final-card .bk-trophy{display:flex; align-items:center; gap:var(--sp-2); padding:var(--sp-2) var(--sp-3);
-    background:var(--red); color:#fff; font-size:var(--fs-2xs);
+    background:var(--red-fill, var(--red)); color:#fff; font-size:var(--fs-2xs);
     font-weight:800; text-transform:uppercase; letter-spacing:.08em}
 
   /* ===== Tree layout ===== */
@@ -336,7 +337,7 @@
     .brand h1{font-size:var(--fs-xl)}
     .top-meta{width:100%; font-size:var(--fs-xs)}
     .groups-grid{grid-template-columns:1fr}
-    .kpis{margin:var(--sp-5) 0; gap:var(--sp-3)}
+    .kpis{margin:var(--sp-5) 0}
     .kpi{padding:var(--sp-4) var(--sp-4)}
     .kpi .value{font-size:var(--fs-3xl)}
     /* Stack each filter control to full width for comfortable tap targets */
@@ -831,7 +832,7 @@ function matchDetailHTML(m, now){
     const goalRow = (g, side) => {
       const tags = `${g.pen?'<span class="gtag">pen</span>':''}${g.og?'<span class="gtag">o.g.</span>':''}`;
       const min = g.minuteLabel ? esc(g.minuteLabel)+"&prime;" : "&ndash;";
-      const who = `<span class="who"><span aria-hidden="true">⚽</span> ${esc(g.name||"Goal")} ${tags}</span>`;
+      const who = `<span class="who"><span class="gdot" aria-hidden="true">●</span> ${esc(g.name||"Goal")} ${tags}</span>`;
       const mn  = `<span class="min">${min}</span>`;
       return `<div class="goal">${side==="left" ? who+mn : mn+who}</div>`;
     };
@@ -974,28 +975,11 @@ function resolveSlot(token){
   return open(t);
 }
 
-// Country flag emoji for the teams in the tournament; placeholders get none.
-const FLAGS = {
-  "Mexico":"🇲🇽","South Africa":"🇿🇦","South Korea":"🇰🇷","Czech Republic":"🇨🇿",
-  "Canada":"🇨🇦","Bosnia & Herzegovina":"🇧🇦","Qatar":"🇶🇦","Switzerland":"🇨🇭",
-  "Brazil":"🇧🇷","Morocco":"🇲🇦","Haiti":"🇭🇹","Scotland":"🏴󠁧󠁢󠁳󠁣󠁴󠁿",
-  "USA":"🇺🇸","Paraguay":"🇵🇾","Australia":"🇦🇺","Türkiye":"🇹🇷",
-  "Germany":"🇩🇪","Curaçao":"🇨🇼","Ivory Coast":"🇨🇮","Ecuador":"🇪🇨",
-  "Netherlands":"🇳🇱","Japan":"🇯🇵","Sweden":"🇸🇪","Tunisia":"🇹🇳",
-  "Belgium":"🇧🇪","Egypt":"🇪🇬","Iran":"🇮🇷","New Zealand":"🇳🇿",
-  "Spain":"🇪🇸","Cape Verde":"🇨🇻","Saudi Arabia":"🇸🇦","Uruguay":"🇺🇾",
-  "France":"🇫🇷","Senegal":"🇸🇳","Iraq":"🇮🇶","Norway":"🇳🇴",
-  "Argentina":"🇦🇷","Algeria":"🇩🇿","Austria":"🇦🇹","Jordan":"🇯🇴",
-  "Portugal":"🇵🇹","DR Congo":"🇨🇩","Uzbekistan":"🇺🇿","Colombia":"🇨🇴",
-  "England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Croatia":"🇭🇷","Ghana":"🇬🇭","Panama":"🇵🇦",
-};
-
 function slotRowHTML(s, score, win){
-  const flag = s.team && FLAGS[s.team]
-    ? `<span class="fl">${FLAGS[s.team]}</span>`
-    : `<span class="fl ph-fl">▢</span>`;
+  // Plain text only — emoji flags don't render on Windows (showed raw "DE"/"ZA"
+  // codes) and the other views (matches/groups/watch) carry no flags either.
   return `<div class="bk-side${s.ph?' ph':''}${s.spanish?' es':''}${win?' win':''}">
-    <span class="nm">${flag}<span class="lbl">${esc(s.label)}</span></span>
+    <span class="nm"><span class="lbl">${esc(s.label)}</span></span>
     <span class="sc">${score!=null?score:""}</span></div>`;
 }
 function matchCardHTML(m, extraClass){
