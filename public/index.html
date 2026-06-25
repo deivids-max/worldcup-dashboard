@@ -395,6 +395,33 @@
   @media (prefers-reduced-motion:reduce){
     *{animation-duration:.001ms !important; transition-duration:.001ms !important; scroll-behavior:auto !important}
   }
+
+  /* ===== NEW (Team profile): clickable team names + modal ===== */
+  .tlink{font:inherit; color:inherit; background:none; border:none; padding:0; margin:0; cursor:pointer;
+    font-weight:inherit; text-align:inherit; border-bottom:1px dotted var(--muted)}
+  .tlink:hover{color:var(--red); border-bottom-color:var(--red)}
+  .tlink:focus-visible{outline:none; box-shadow:var(--ring)}
+  .tm-overlay{position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:flex-start;
+    justify-content:center; padding:var(--sp-6); z-index:50; overflow-y:auto}
+  .tm-card{background:var(--panel); border:1px solid var(--line-strong); border-top:5px solid var(--red);
+    width:100%; max-width:560px; margin:auto}
+  .tm-head{display:flex; align-items:flex-start; justify-content:space-between; gap:var(--sp-4);
+    padding:var(--sp-4) var(--sp-5); border-bottom:1px solid var(--ink)}
+  .tm-head h2{margin:0; font-size:var(--fs-xl); font-weight:800; text-transform:uppercase; letter-spacing:-.01em}
+  .tm-sub{margin:var(--sp-1) 0 0; color:var(--muted); font-size:var(--fs-2xs); font-weight:700;
+    text-transform:uppercase; letter-spacing:.08em}
+  .tm-body{padding:var(--sp-3) var(--sp-5) var(--sp-5)}
+  .tp-row{display:grid; grid-template-columns:62px 1fr auto; gap:var(--sp-3); align-items:center;
+    padding:var(--sp-2) 0; border-bottom:1px solid var(--line); font-size:var(--fs-sm)}
+  .tp-row:last-child{border-bottom:none}
+  .tp-next{box-shadow:inset 3px 0 0 var(--red); padding-left:var(--sp-2)}
+  .tp-when{font-weight:700; font-variant-numeric:tabular-nums}
+  .tp-opp{font-weight:600}
+  .tp-opp small{display:block; color:var(--muted); font-weight:500; font-size:var(--fs-2xs);
+    text-transform:uppercase; letter-spacing:.05em}
+  .tp-sc{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:700}
+  .tp-res{display:inline-block; min-width:14px; font-weight:800; margin-right:var(--sp-1)}
+  .tp-W{color:var(--ink)} .tp-L{color:var(--muted)} .tp-D{color:var(--muted)}
 </style>
 <script>
   /* Set theme before first paint to avoid a flash of the wrong theme. */
@@ -545,6 +572,17 @@
     <div id="footNote"></div>
     Data: openfootball (public domain). Standalone single-file dashboard — works offline using a built-in dataset, and auto-updates scores when online.
   </footer>
+</div>
+
+<!-- ===== NEW (Team profile modal): populated when a team name is clicked ===== -->
+<div id="teamModal" class="tm-overlay hide" role="dialog" aria-modal="true" aria-labelledby="tmTitle" tabindex="-1">
+  <div class="tm-card">
+    <div class="tm-head">
+      <div><h2 id="tmTitle"></h2><p id="tmSub" class="tm-sub"></p></div>
+      <button type="button" class="btn" id="tmClose" aria-label="Close team profile">Close</button>
+    </div>
+    <div class="tm-body" id="tmBody"></div>
+  </div>
 </div>
 
 <script>
@@ -741,10 +779,10 @@ function teamHTML(name){
 // nation once decided; group matches stay as the plain team name.
 function matchTeamHTML(m, side){
   const tok = side===1 ? m.team1 : m.team2;
-  if(m.isGroup) return teamHTML(tok);
+  if(m.isGroup) return teamBtn(tok);
   const s = resolveSlot(tok);
-  const cls = s.ph?'ph':'';
-  return `<span class="${cls}">${esc(s.label)}</span>`;
+  if(s.ph) return `<span class="ph">${esc(s.label)}</span>`;
+  return teamBtn(s.team);   // confirmed nation — clickable profile link
 }
 function fmtCountdown(ms){
   if(ms<=0) return "now";
@@ -925,7 +963,7 @@ function renderWatch(now){
     const imp=impactOf(m);
     return `<div class="watch-item">
       <div class="watch-when">${dayShort(m.kickoff)}<small>${fmtTime(m.kickoff)} ${tzAbbr(m.kickoff)}</small></div>
-      <div class="watch-teams">${teamHTML(m.team1)} <span class="vs">v</span> ${teamHTML(m.team2)}
+      <div class="watch-teams">${teamBtn(m.team1)} <span class="vs">v</span> ${teamBtn(m.team2)}
         <small>${esc(m.isGroup?m.group:m.round)} · ${esc(m.ground)}</small></div>
       <div style="text-align:right">
         <span class="imp imp-${imp.key}">${imp.label}</span>
@@ -959,7 +997,7 @@ function renderGroups(){
     const body = rows.map((r,i)=>`
       <tr class="${i<2?'q':''}">
         <td class="pos">${i+1}</td>
-        <td class="team">${esc(r.team)}</td>
+        <td class="team">${teamBtn(r.team)}</td>
         <td>${r.P}</td><td>${r.W}</td><td>${r.D}</td><td>${r.L}</td>
         <td>${r.GF}:${r.GA}</td><td>${r.GD>0?'+':''}${r.GD}</td>
         <td class="pts">${r.Pts}</td>
@@ -1267,6 +1305,7 @@ function wireEvents(){
     activateTab(tabs[j], true);   // roving focus + activate (auto-activation pattern)
   });
   el("matchBody").addEventListener("click",e=>{
+    if(e.target.closest(".tlink")) return;                           // team-name click opens the profile, not the row
     if(window.getSelection && String(window.getSelection())) return; // don't toggle on text selection
     const row=e.target.closest("tr.match"); if(!row) return;
     toggleMatch(row.dataset.id);
@@ -1295,6 +1334,75 @@ function wireEvents(){
     setTimezone(e.target.value, opt.dataset.label);
   });
   el("refreshBtn").addEventListener("click",()=>{ el("srcText").textContent="Refreshing…"; loadLive(); });
+
+  // NEW (Team profile): open on any team-name link; close via button / backdrop / Esc.
+  document.addEventListener("click", e=>{
+    const link = e.target.closest(".tlink");
+    if(link) openTeamProfile(link.dataset.team);
+  });
+  el("tmClose").addEventListener("click", closeTeamProfile);
+  el("teamModal").addEventListener("click", e=>{ if(e.target===el("teamModal")) closeTeamProfile(); });
+  document.addEventListener("keydown", e=>{
+    if(e.key==="Escape" && !el("teamModal").classList.contains("hide")) closeTeamProfile();
+  });
+}
+
+/* ===== NEW (Team profile): click a team name to see their group, results & next match ===== */
+function ordSuffix(n){ return n===1?"st":n===2?"nd":n===3?"rd":"th"; }
+// Render a real team name as a clickable profile link; knockout placeholders stay inert.
+function teamBtn(name){
+  if(name==null || name==="") return "";
+  if(/^[0-9]|^W\d|^L\d|\//.test(String(name))) return `<span class="ph">${esc(name)}</span>`;
+  return `<button type="button" class="tlink" data-team="${esc(name)}">${esc(name)}</button>`;
+}
+// The two real nations in a match (knockout placeholders resolved to nations, else null).
+function teamsOf(m){
+  return m.isGroup ? [m.team1, m.team2] : [resolveSlot(m.team1).team, resolveSlot(m.team2).team];
+}
+function matchesForTeam(name){
+  return MATCHES.filter(m=>teamsOf(m).includes(name)).sort((a,b)=>a.kickoff-b.kickoff);
+}
+let _tmLastFocus = null;
+function openTeamProfile(name){
+  const ms = matchesForTeam(name);
+  const now = Date.now();
+  let sub = "Knockout stage";
+  const grp = ms.find(m=>m.isGroup);
+  if(grp){
+    const st = computeStandings(grp.group);
+    const i = st.findIndex(r=>r.team===name);
+    sub = i>=0
+      ? `${grp.group} · ${i+1}${ordSuffix(i+1)} · ${st[i].Pts} pt${st[i].Pts===1?"":"s"} · GD ${st[i].GD>0?"+":""}${st[i].GD} · P${st[i].P}`
+      : grp.group;
+  }
+  const next = ms.find(m=>m.kickoff.getTime()>now && !m.ft);
+  const rows = ms.map(m=>{
+    const opp = teamsOf(m).find(t=>t && t!==name) || "TBD";
+    let sc;
+    if(m.ft){
+      const meFirst = (m.isGroup?m.team1:resolveSlot(m.team1).team)===name;
+      const gf = meFirst?m.ft[0]:m.ft[1], ga = meFirst?m.ft[1]:m.ft[0];
+      const o = gf>ga?"W":gf<ga?"L":"D";
+      sc = `<span class="tp-res tp-${o}">${o}</span>${gf}–${ga}`;
+    } else {
+      sc = `<span class="tz" data-t="${m.kickoff.getTime()}"></span>`;
+    }
+    return `<div class="tp-row${m===next?" tp-next":""}">
+      <span class="tp-when">${dayShort(m.kickoff)}</span>
+      <span class="tp-opp">vs ${esc(opp)}<small>${esc(m.isGroup?m.group:m.round)}</small></span>
+      <span class="tp-sc">${sc}</span></div>`;
+  }).join("");
+  el("tmTitle").textContent = name;
+  el("tmSub").textContent = sub;
+  el("tmBody").innerHTML = rows || `<p class="detail-note">No matches found for this team.</p>`;
+  _tmLastFocus = document.activeElement;
+  el("teamModal").classList.remove("hide");
+  el("tmClose").focus();
+  tickCountdowns();
+}
+function closeTeamProfile(){
+  el("teamModal").classList.add("hide");
+  if(_tmLastFocus && _tmLastFocus.focus) _tmLastFocus.focus();
 }
 
 /* ---------------- Init ---------------- */
