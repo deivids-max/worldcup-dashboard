@@ -182,6 +182,15 @@
   .venue{color:var(--muted); font-size:var(--fs-sm)}
   .stage-tag{font-size:var(--fs-3xs); font-weight:700; color:var(--ink); background:transparent; border:1px solid var(--line-strong);
     padding:2px var(--sp-2); border-radius:0; white-space:nowrap; text-transform:uppercase; letter-spacing:.06em}
+  /* Knockout match number (e.g. M89) — hairline-divided suffix inside the stage tag.
+     Monochrome, no red, tabular numerals; inherits the tag's uppercase tracking. */
+  .stage-tag .stage-num{margin-left:var(--sp-2); padding-left:var(--sp-2); border-left:1px solid var(--line);
+    color:var(--muted); font-variant-numeric:tabular-nums}
+  /* Detail-panel fact: subdued, same mid-dot separator look as the bracket meta. */
+  .facts .fact-num{color:var(--muted); font-variant-numeric:tabular-nums}
+  /* Bracket card footer number: tabular, ink (the card's own identity) but not bolded,
+     so it sits quietly inside the muted footer next to the venue. */
+  .bk-meta .bk-num{color:var(--ink); font-variant-numeric:tabular-nums}
   .score{font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap; font-size:var(--fs-lg)}
 
   /* Expandable match detail */
@@ -807,7 +816,7 @@ function renderMatches(now){
       <td><div class="kick-cell"><span class="caret" aria-hidden="true">›</span>
         <div><div class="time">${fmtTime(m.kickoff)}</div><div class="tz">${tzAbbr(m.kickoff)}</div></div></div></td>
       <td class="teams">${matchTeamHTML(m,1)} <span class="vs">v</span> ${matchTeamHTML(m,2)}</td>
-      <td><span class="stage-tag">${esc(m.isGroup?m.group:m.round)}</span></td>
+      <td><span class="stage-tag">${esc(m.isGroup?m.group:m.round)}${(!m.isGroup&&m.num!=null)?`<span class="stage-num">M${m.num}</span>`:""}</span></td>
       <td class="col-venue venue">${esc(m.ground)}</td>
       <td class="col-imp"><span class="imp imp-${imp.key}">${imp.label}</span></td>
       <td>${statusCell}</td>
@@ -866,7 +875,7 @@ function matchDetailHTML(m, now){
         <p class="detail-h">Match facts</p>
         <dl class="facts">
           <dt>Kick-off</dt><dd>${dayLong(ko)} · ${fmtTime(ko)} ${tzAbbr(ko)}</dd>
-          <dt>Stage</dt><dd>${esc(m.isGroup?m.group:m.round)}</dd>
+          <dt>Stage</dt><dd>${esc(m.isGroup?m.group:m.round)}${(!m.isGroup&&m.num!=null)?` <span class="fact-num">· Match ${m.num}</span>`:""}</dd>
           <dt>Venue</dt><dd>${esc(m.ground||"To be confirmed")}</dd>
           <dt>Status</dt><dd>${m.ft?"Full time":esc(st.label)}</dd>
           <dt>Result</dt><dd>${resultLine}</dd>
@@ -1000,7 +1009,7 @@ function matchCardHTML(m, extraClass){
     ${slotRowHTML(a, played?m.ft[0]:null, aw)}
     ${slotRowHTML(b, played?m.ft[1]:null, bw)}
     <div class="bk-meta"><span>${dayShort(m.kickoff)} · ${fmtTime(m.kickoff)} ${tzAbbr(m.kickoff)}</span>
-      <span class="v">${esc(m.ground)}</span></div>
+      <span class="v">${(!m.isGroup&&m.num!=null)?`<span class="bk-num">Match ${m.num}</span> · `:""}${esc(m.ground)}</span></div>
   </div>`;
 }
 
