@@ -4,9 +4,30 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>FIFA World Cup 2026 Dashboard</title>
+<meta name="description" content="Live fixtures, results, group standings, and the knockout bracket for the 2026 FIFA World Cup — with timezone-aware kickoff times and dark mode." />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0b0b0b" media="(prefers-color-scheme: dark)" />
+<link rel="canonical" href="https://worldcup-dashboard-2ge.pages.dev/" />
+
+<!-- Open Graph / social sharing -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="FIFA World Cup 2026 Dashboard" />
+<meta property="og:description" content="Live fixtures, results, group standings, and the knockout bracket for the 2026 FIFA World Cup." />
+<meta property="og:url" content="https://worldcup-dashboard-2ge.pages.dev/" />
+<meta name="twitter:card" content="summary" />
+
+<!-- Inline SVG favicon (no extra request, avoids a 404) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23e2231a'/%3E%3Ctext x='32' y='46' font-family='Arial,Helvetica,sans-serif' font-size='36' font-weight='bold' fill='%23ffffff' text-anchor='middle'%3E26%3C/text%3E%3C/svg%3E" />
+
+<!-- Fonts: only the weights actually used (400/500/600/700/800) -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<!-- Speed up the live match-data fetch -->
+<link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin />
+<link rel="dns-prefetch" href="https://raw.githubusercontent.com" />
 <style>
   /* ===========================================================================
      Swiss / International Typographic Style: grotesk type, strict grid,
