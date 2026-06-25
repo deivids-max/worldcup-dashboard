@@ -1,8 +1,9 @@
 # Cloudflare Wrangler local state
 .wrangler/
 
-# Claude Code worktrees / local job state
+# Claude Code local state (do not commit to a public repo)
+.claude/settings.local.json
 .claude/worktrees/
 
-# Temp files
+# Temp / scratch files
 .tmp_out.json
