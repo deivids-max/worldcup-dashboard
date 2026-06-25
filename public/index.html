@@ -295,6 +295,9 @@
   .stand tr.q td.team{box-shadow:inset 3px 0 0 var(--ink)}
   .stand .pts{font-weight:700}
   .stand .pos{color:var(--muted); width:20px}
+  /* NEW (Group progress bar): share of the six group matches completed — monochrome, square. */
+  .gprog{height:4px; background:var(--line)}
+  .gprog-fill{height:100%; background:var(--ink); transition:width var(--ease)}
   .legend{display:flex; gap:var(--sp-3) var(--sp-5); flex-wrap:wrap; color:var(--muted); font-size:var(--fs-xs); margin:var(--sp-5) 2px 0;
     align-items:center}
   .legend>span{display:inline-flex; align-items:center}
@@ -963,6 +966,8 @@ function renderGroups(){
       </tr>`).join("");
     return `<div class="group-card">
       <h3>${esc(g)} <span class="gmeta">${played}/${total} played</span></h3>
+      <!-- NEW (Group progress bar): visual share of the six group matches completed -->
+      <div class="gprog" title="${played} of ${total} group matches played"><div class="gprog-fill" style="width:${total?Math.round(played/total*100):0}%"></div></div>
       <table class="stand">
         <thead><tr><th class="pos"></th><th class="team">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF:GA</th><th>GD</th><th>Pts</th></tr></thead>
         <tbody>${body}</tbody>
