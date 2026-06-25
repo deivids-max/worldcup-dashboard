@@ -1,0 +1,10 @@
+# Files that should NOT be served on the public Cloudflare Pages site.
+# Only the app (index.html) should be deployed.
+.git
+.gitignore
+.assetsignore
+.claude
+.wrangler
+CLAUDE.md
+*.log
+.tmp_out.json

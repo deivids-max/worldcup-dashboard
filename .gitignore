@@ -1,0 +1,8 @@
+# Cloudflare Wrangler local state
+.wrangler/
+
+# Claude Code worktrees / local job state
+.claude/worktrees/
+
+# Temp files
+.tmp_out.json
