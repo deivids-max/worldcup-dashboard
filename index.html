@@ -208,7 +208,6 @@
   tr.match:focus-visible{outline:none}
   tr.match:focus-visible td:first-child{box-shadow:inset 3px 0 0 var(--brand-2)}
   tr.match:focus-visible td{background:color-mix(in srgb,var(--brand-2) 8%,var(--panel))}
-  .sim-reset:focus-visible,.sim-select:focus-visible{outline:none; box-shadow:var(--ring)}
   tr.detail-row td{padding:0; background:#fbfcfe; border-bottom:1px solid var(--line)}
   .detail-wrap{padding:var(--sp-4) var(--sp-4) var(--sp-4); display:grid;
     grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:var(--sp-5)}
@@ -231,67 +230,6 @@
     color:var(--muted); border:1px solid var(--line-strong); border-radius:4px; padding:1px var(--sp-1); margin-left:var(--sp-2)}
   .detail-note{margin:0; color:var(--muted); font-size:var(--fs-sm); font-style:italic}
   @media (max-width:700px){ .detail-wrap{grid-template-columns:1fr; gap:var(--sp-4)} }
-
-  /* Knockout participant simulator */
-  .sim-block{border-top:1px solid var(--line); padding:var(--sp-4) var(--sp-4) var(--sp-4)}
-  .sim-note{font-style:normal; font-weight:600; text-transform:none; letter-spacing:0;
-    color:var(--muted); margin-left:var(--sp-2); font-size:var(--fs-2xs)}
-  .sim-reset{cursor:pointer; border:1px solid var(--line-strong); background:var(--panel);
-    color:var(--brand-2); font-weight:700; font-size:var(--fs-2xs); padding:2px var(--sp-2); border-radius:6px}
-  .sim-reset:hover{border-color:var(--brand-2)}
-  .sim-grid{display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-5)}
-  @media (max-width:700px){ .sim-grid{grid-template-columns:1fr} }
-  .sim-slot-h{font-weight:700; font-size:var(--fs-sm); margin-bottom:var(--sp-2)}
-  .sim-approx{color:var(--muted); font-weight:600; cursor:help}
-  /* Fixed name track + flexible bar so the bars line up and stay comparable
-     across BOTH slots (each slot is its own grid, so the tracks must match). */
-  .cand{display:grid; grid-template-columns:92px 1fr 40px; align-items:center; gap:var(--sp-3);
-    font-size:var(--fs-sm); margin-bottom:var(--sp-2)}
-  .cand-nm{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0}
-  .cand.es .cand-nm{color:var(--high-ink)}
-  .cand.chosen{background:var(--good-bg); border-radius:6px; padding:2px var(--sp-2); margin-left:-6px}
-  .cand-bar{height:8px; background:var(--line); border-radius:999px; overflow:hidden}
-  .cand-bar i{display:block; height:100%; background:var(--brand-2); border-radius:999px}
-  .cand.chosen .cand-bar i{background:var(--good)}
-  .cand-pct{font-variant-numeric:tabular-nums; font-weight:700; color:var(--muted);
-    text-align:right}
-  .sim-pick{display:flex; align-items:center; gap:var(--sp-2); margin-top:var(--sp-3); font-size:var(--fs-xs);
-    font-weight:600; color:var(--muted)}
-  .sim-pick select{min-width:0; flex:1}
-  .sim-tag{font-size:var(--fs-3xs); font-weight:800; text-transform:uppercase; letter-spacing:.5px;
-    color:#fff; background:var(--accent); border-radius:4px; padding:1px var(--sp-1); margin-left:var(--sp-2);
-    vertical-align:middle}
-  .sim-name{font-weight:700}
-  .bk-side.sim .nm{color:var(--accent)}
-
-  /* Odds view — title race + probability table */
-  #titleRace{padding:var(--sp-3) var(--sp-4) var(--sp-4)}
-  .tr-row{display:grid; grid-template-columns:minmax(120px,180px) 1fr 44px; align-items:center;
-    gap:var(--sp-3); margin-bottom:var(--sp-2); font-size:var(--fs-sm)}
-  .tr-nm{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .tr-row.es .tr-nm{color:var(--high-ink)}
-  .tr-bar{height:14px; background:var(--line); border-radius:999px; overflow:hidden}
-  .tr-bar i{display:block; height:100%; background:linear-gradient(90deg,var(--brand-2),var(--good));
-    border-radius:999px}
-  .tr-pct{font-variant-numeric:tabular-nums; font-weight:700; text-align:right; color:var(--ink)}
-  #oddsTable{width:100%; border-collapse:collapse; font-size:var(--fs-sm)}
-  #oddsTable th{font-size:var(--fs-2xs); text-transform:uppercase; letter-spacing:.4px; color:var(--muted);
-    font-weight:700; padding:var(--sp-2) var(--sp-2); border-bottom:1px solid var(--line); text-align:center;
-    cursor:pointer; white-space:nowrap; user-select:none}
-  #oddsTable th:hover{color:var(--brand)}
-  #oddsTable th.sorted{color:var(--brand)}
-  #oddsTable th.odds-team{text-align:left; padding-left:var(--sp-4)}
-  #oddsTable td{padding:6px var(--sp-2); border-bottom:1px solid var(--line); text-align:center;
-    font-variant-numeric:tabular-nums}
-  #oddsTable td.odds-team{text-align:left; padding-left:var(--sp-4); font-weight:600; white-space:nowrap}
-  #oddsTable tr.es td.odds-team{color:var(--high-ink)}
-  #oddsTable tbody tr:hover td{background:color-mix(in srgb,var(--brand) 5%,transparent)}
-  #oddsTable td.odds-champ .pc{font-weight:800}
-  .pc{display:inline-block; min-width:34px; padding:2px 6px; border-radius:var(--radius-sm);
-    font-weight:600; font-variant-numeric:tabular-nums}
-  .pc0{color:var(--line-strong)}
-  .stand th.adv,.stand td.adv{text-align:center; padding-right:var(--sp-3)}
-  .stand td.adv .pc{min-width:30px; font-size:var(--fs-2xs)}
 
   .badge{display:inline-block; font-size:var(--fs-3xs); font-weight:700; padding:3px var(--sp-2); border-radius:999px;
     text-transform:uppercase; letter-spacing:.4px; white-space:nowrap}
@@ -478,7 +416,6 @@
     <button type="button" class="tab" role="tab" id="tab-watch" data-view="watch" aria-selected="false" aria-controls="view-watch" tabindex="-1">Spanish-speaking teams</button>
     <button type="button" class="tab" role="tab" id="tab-groups" data-view="groups" aria-selected="false" aria-controls="view-groups" tabindex="-1">Groups &amp; Standings</button>
     <button type="button" class="tab" role="tab" id="tab-bracket" data-view="bracket" aria-selected="false" aria-controls="view-bracket" tabindex="-1">Knockout bracket</button>
-    <button type="button" class="tab" role="tab" id="tab-odds" data-view="odds" aria-selected="false" aria-controls="view-odds" tabindex="-1">Odds</button>
   </div>
 
   <!-- MATCHES VIEW -->
@@ -585,31 +522,6 @@
     </p>
   </section>
 
-  <!-- ODDS VIEW -->
-  <section id="view-odds" class="hide" role="tabpanel" aria-labelledby="tab-odds" tabindex="0">
-    <div class="panel" style="margin-bottom:var(--sp-4)">
-      <div class="panel-head">
-        <h2>Title race</h2>
-        <span class="hint">Probability of winning the tournament</span>
-      </div>
-      <div id="titleRace"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-head">
-        <h2>Tournament odds</h2>
-        <span class="hint">Click a column to sort</span>
-      </div>
-      <div class="scroll-x">
-        <table id="oddsTable"></table>
-      </div>
-    </div>
-    <p class="legend">
-      <span><span class="sw" style="background:var(--good)"></span>Champion odds</span>
-      <span><span class="sw" style="background:var(--high)"></span>Spanish-speaking team</span>
-      <span>From Elo ratings, results so far, and the Monte-Carlo simulator. Win=win group, Adv=reach knockouts.</span>
-    </p>
-  </section>
-
   <footer>
     <div id="footNote"></div>
     Data: openfootball (public domain). Standalone single-file dashboard — works offline using a built-in dataset, and auto-updates scores when online.
@@ -656,28 +568,6 @@ const KNOCKOUT_ORDER = ["Round of 32","Round of 16","Quarter-final","Semi-final"
 
 /* ---- Embedded fallback: full 104-match dataset ---- */
 const EMBEDDED = [{"round":"Matchday 1","date":"2026-06-11","time":"13:00 UTC-6","team1":"Mexico","team2":"South Africa","group":"Group A","ground":"Mexico City","ft":[2,0]},{"round":"Matchday 1","date":"2026-06-11","time":"20:00 UTC-6","team1":"South Korea","team2":"Czech Republic","group":"Group A","ground":"Guadalajara (Zapopan)","ft":[2,1]},{"round":"Matchday 8","date":"2026-06-18","time":"12:00 UTC-4","team1":"Czech Republic","team2":"South Africa","group":"Group A","ground":"Atlanta","ft":[1,1]},{"round":"Matchday 8","date":"2026-06-18","time":"19:00 UTC-6","team1":"Mexico","team2":"South Korea","group":"Group A","ground":"Guadalajara (Zapopan)","ft":[1,0]},{"round":"Matchday 14","date":"2026-06-24","time":"19:00 UTC-6","team1":"Czech Republic","team2":"Mexico","group":"Group A","ground":"Mexico City","ft":null},{"round":"Matchday 14","date":"2026-06-24","time":"19:00 UTC-6","team1":"South Africa","team2":"South Korea","group":"Group A","ground":"Monterrey (Guadalupe)","ft":null},{"round":"Matchday 2","date":"2026-06-12","time":"15:00 UTC-4","team1":"Canada","team2":"Bosnia & Herzegovina","group":"Group B","ground":"Toronto","ft":[1,1]},{"round":"Matchday 3","date":"2026-06-13","time":"12:00 UTC-7","team1":"Qatar","team2":"Switzerland","group":"Group B","ground":"San Francisco Bay Area (Santa Clara)","ft":[1,1]},{"round":"Matchday 8","date":"2026-06-18","time":"12:00 UTC-7","team1":"Switzerland","team2":"Bosnia & Herzegovina","group":"Group B","ground":"Los Angeles (Inglewood)","ft":[4,1]},{"round":"Matchday 8","date":"2026-06-18","time":"15:00 UTC-7","team1":"Canada","team2":"Qatar","group":"Group B","ground":"Vancouver","ft":[6,0]},{"round":"Matchday 14","date":"2026-06-24","time":"12:00 UTC-7","team1":"Switzerland","team2":"Canada","group":"Group B","ground":"Vancouver","ft":null},{"round":"Matchday 14","date":"2026-06-24","time":"12:00 UTC-7","team1":"Bosnia & Herzegovina","team2":"Qatar","group":"Group B","ground":"Seattle","ft":null},{"round":"Matchday 3","date":"2026-06-13","time":"18:00 UTC-4","team1":"Brazil","team2":"Morocco","group":"Group C","ground":"New York/New Jersey (East Rutherford)","ft":[1,1]},{"round":"Matchday 3","date":"2026-06-13","time":"21:00 UTC-4","team1":"Haiti","team2":"Scotland","group":"Group C","ground":"Boston (Foxborough)","ft":[0,1]},{"round":"Matchday 9","date":"2026-06-19","time":"18:00 UTC-4","team1":"Scotland","team2":"Morocco","group":"Group C","ground":"Boston (Foxborough)","ft":[0,1]},{"round":"Matchday 9","date":"2026-06-19","time":"20:30 UTC-4","team1":"Brazil","team2":"Haiti","group":"Group C","ground":"Philadelphia","ft":[3,0]},{"round":"Matchday 14","date":"2026-06-24","time":"18:00 UTC-4","team1":"Scotland","team2":"Brazil","group":"Group C","ground":"Miami (Miami Gardens)","ft":null},{"round":"Matchday 14","date":"2026-06-24","time":"18:00 UTC-4","team1":"Morocco","team2":"Haiti","group":"Group C","ground":"Atlanta","ft":null},{"round":"Matchday 2","date":"2026-06-12","time":"18:00 UTC-7","team1":"USA","team2":"Paraguay","group":"Group D","ground":"Los Angeles (Inglewood)","ft":[4,1]},{"round":"Matchday 3","date":"2026-06-13","time":"21:00 UTC-7","team1":"Australia","team2":"Turkey","group":"Group D","ground":"Vancouver","ft":[2,0]},{"round":"Matchday 9","date":"2026-06-19","time":"12:00 UTC-7","team1":"USA","team2":"Australia","group":"Group D","ground":"Seattle","ft":[2,0]},{"round":"Matchday 9","date":"2026-06-19","time":"20:00 UTC-7","team1":"Turkey","team2":"Paraguay","group":"Group D","ground":"San Francisco Bay Area (Santa Clara)","ft":[0,1]},{"round":"Matchday 15","date":"2026-06-25","time":"19:00 UTC-7","team1":"Turkey","team2":"USA","group":"Group D","ground":"Los Angeles (Inglewood)","ft":null},{"round":"Matchday 15","date":"2026-06-25","time":"19:00 UTC-7","team1":"Paraguay","team2":"Australia","group":"Group D","ground":"San Francisco Bay Area (Santa Clara)","ft":null},{"round":"Matchday 4","date":"2026-06-14","time":"12:00 UTC-5","team1":"Germany","team2":"Curaçao","group":"Group E","ground":"Houston","ft":[7,1]},{"round":"Matchday 4","date":"2026-06-14","time":"19:00 UTC-4","team1":"Ivory Coast","team2":"Ecuador","group":"Group E","ground":"Philadelphia","ft":[1,0]},{"round":"Matchday 10","date":"2026-06-20","time":"16:00 UTC-4","team1":"Germany","team2":"Ivory Coast","group":"Group E","ground":"Toronto","ft":[2,1]},{"round":"Matchday 10","date":"2026-06-20","time":"19:00 UTC-5","team1":"Ecuador","team2":"Curaçao","group":"Group E","ground":"Kansas City","ft":[0,0]},{"round":"Matchday 15","date":"2026-06-25","time":"16:00 UTC-4","team1":"Curaçao","team2":"Ivory Coast","group":"Group E","ground":"Philadelphia","ft":null},{"round":"Matchday 15","date":"2026-06-25","time":"16:00 UTC-4","team1":"Ecuador","team2":"Germany","group":"Group E","ground":"New York/New Jersey (East Rutherford)","ft":null},{"round":"Matchday 4","date":"2026-06-14","time":"15:00 UTC-5","team1":"Netherlands","team2":"Japan","group":"Group F","ground":"Dallas (Arlington)","ft":[2,2]},{"round":"Matchday 4","date":"2026-06-14","time":"20:00 UTC-6","team1":"Sweden","team2":"Tunisia","group":"Group F","ground":"Monterrey (Guadalupe)","ft":[5,1]},{"round":"Matchday 10","date":"2026-06-20","time":"12:00 UTC-5","team1":"Netherlands","team2":"Sweden","group":"Group F","ground":"Houston","ft":[5,1]},{"round":"Matchday 10","date":"2026-06-20","time":"22:00 UTC-6","team1":"Tunisia","team2":"Japan","group":"Group F","ground":"Monterrey (Guadalupe)","ft":[0,4]},{"round":"Matchday 15","date":"2026-06-25","time":"18:00 UTC-5","team1":"Japan","team2":"Sweden","group":"Group F","ground":"Dallas (Arlington)","ft":null},{"round":"Matchday 15","date":"2026-06-25","time":"18:00 UTC-5","team1":"Tunisia","team2":"Netherlands","group":"Group F","ground":"Kansas City","ft":null},{"round":"Matchday 5","date":"2026-06-15","time":"12:00 UTC-7","team1":"Belgium","team2":"Egypt","group":"Group G","ground":"Seattle","ft":[1,1]},{"round":"Matchday 5","date":"2026-06-15","time":"18:00 UTC-7","team1":"Iran","team2":"New Zealand","group":"Group G","ground":"Los Angeles (Inglewood)","ft":[2,2]},{"round":"Matchday 11","date":"2026-06-21","time":"12:00 UTC-7","team1":"Belgium","team2":"Iran","group":"Group G","ground":"Los Angeles (Inglewood)","ft":[0,0]},{"round":"Matchday 11","date":"2026-06-21","time":"18:00 UTC-7","team1":"New Zealand","team2":"Egypt","group":"Group G","ground":"Vancouver","ft":[1,3]},{"round":"Matchday 16","date":"2026-06-26","time":"20:00 UTC-7","team1":"Egypt","team2":"Iran","group":"Group G","ground":"Seattle","ft":null},{"round":"Matchday 16","date":"2026-06-26","time":"20:00 UTC-7","team1":"New Zealand","team2":"Belgium","group":"Group G","ground":"Vancouver","ft":null},{"round":"Matchday 5","date":"2026-06-15","time":"12:00 UTC-4","team1":"Spain","team2":"Cape Verde","group":"Group H","ground":"Atlanta","ft":[0,0]},{"round":"Matchday 5","date":"2026-06-15","time":"18:00 UTC-4","team1":"Saudi Arabia","team2":"Uruguay","group":"Group H","ground":"Miami (Miami Gardens)","ft":[1,1]},{"round":"Matchday 11","date":"2026-06-21","time":"12:00 UTC-4","team1":"Spain","team2":"Saudi Arabia","group":"Group H","ground":"Atlanta","ft":[4,0]},{"round":"Matchday 11","date":"2026-06-21","time":"18:00 UTC-4","team1":"Uruguay","team2":"Cape Verde","group":"Group H","ground":"Miami (Miami Gardens)","ft":[2,2]},{"round":"Matchday 16","date":"2026-06-26","time":"19:00 UTC-5","team1":"Cape Verde","team2":"Saudi Arabia","group":"Group H","ground":"Houston","ft":null},{"round":"Matchday 16","date":"2026-06-26","time":"18:00 UTC-6","team1":"Uruguay","team2":"Spain","group":"Group H","ground":"Guadalajara (Zapopan)","ft":null},{"round":"Matchday 6","date":"2026-06-16","time":"15:00 UTC-4","team1":"France","team2":"Senegal","group":"Group I","ground":"New York/New Jersey (East Rutherford)","ft":[3,1]},{"round":"Matchday 6","date":"2026-06-16","time":"18:00 UTC-4","team1":"Iraq","team2":"Norway","group":"Group I","ground":"Boston (Foxborough)","ft":[1,4]},{"round":"Matchday 12","date":"2026-06-22","time":"17:00 UTC-4","team1":"France","team2":"Iraq","group":"Group I","ground":"Philadelphia","ft":[3,0]},{"round":"Matchday 12","date":"2026-06-22","time":"20:00 UTC-4","team1":"Norway","team2":"Senegal","group":"Group I","ground":"New York/New Jersey (East Rutherford)","ft":[3,2]},{"round":"Matchday 16","date":"2026-06-26","time":"15:00 UTC-4","team1":"Norway","team2":"France","group":"Group I","ground":"Boston (Foxborough)","ft":null},{"round":"Matchday 16","date":"2026-06-26","time":"15:00 UTC-4","team1":"Senegal","team2":"Iraq","group":"Group I","ground":"Toronto","ft":null},{"round":"Matchday 6","date":"2026-06-16","time":"20:00 UTC-5","team1":"Argentina","team2":"Algeria","group":"Group J","ground":"Kansas City","ft":[3,0]},{"round":"Matchday 6","date":"2026-06-16","time":"21:00 UTC-7","team1":"Austria","team2":"Jordan","group":"Group J","ground":"San Francisco Bay Area (Santa Clara)","ft":[3,1]},{"round":"Matchday 12","date":"2026-06-22","time":"12:00 UTC-5","team1":"Argentina","team2":"Austria","group":"Group J","ground":"Dallas (Arlington)","ft":[2,0]},{"round":"Matchday 12","date":"2026-06-22","time":"20:00 UTC-7","team1":"Jordan","team2":"Algeria","group":"Group J","ground":"San Francisco Bay Area (Santa Clara)","ft":[1,2]},{"round":"Matchday 17","date":"2026-06-27","time":"21:00 UTC-5","team1":"Algeria","team2":"Austria","group":"Group J","ground":"Kansas City","ft":null},{"round":"Matchday 17","date":"2026-06-27","time":"21:00 UTC-5","team1":"Jordan","team2":"Argentina","group":"Group J","ground":"Dallas (Arlington)","ft":null},{"round":"Matchday 7","date":"2026-06-17","time":"12:00 UTC-5","team1":"Portugal","team2":"DR Congo","group":"Group K","ground":"Houston","ft":[1,1]},{"round":"Matchday 7","date":"2026-06-17","time":"20:00 UTC-6","team1":"Uzbekistan","team2":"Colombia","group":"Group K","ground":"Mexico City","ft":[1,3]},{"round":"Matchday 13","date":"2026-06-23","time":"12:00 UTC-5","team1":"Portugal","team2":"Uzbekistan","group":"Group K","ground":"Houston","ft":null},{"round":"Matchday 13","date":"2026-06-23","time":"20:00 UTC-6","team1":"Colombia","team2":"DR Congo","group":"Group K","ground":"Guadalajara (Zapopan)","ft":null},{"round":"Matchday 17","date":"2026-06-27","time":"19:30 UTC-4","team1":"Colombia","team2":"Portugal","group":"Group K","ground":"Miami (Miami Gardens)","ft":null},{"round":"Matchday 17","date":"2026-06-27","time":"19:30 UTC-4","team1":"DR Congo","team2":"Uzbekistan","group":"Group K","ground":"Atlanta","ft":null},{"round":"Matchday 7","date":"2026-06-17","time":"15:00 UTC-5","team1":"England","team2":"Croatia","group":"Group L","ground":"Dallas (Arlington)","ft":[4,2]},{"round":"Matchday 7","date":"2026-06-17","time":"19:00 UTC-4","team1":"Ghana","team2":"Panama","group":"Group L","ground":"Toronto","ft":[1,0]},{"round":"Matchday 13","date":"2026-06-23","time":"16:00 UTC-4","team1":"England","team2":"Ghana","group":"Group L","ground":"Boston (Foxborough)","ft":null},{"round":"Matchday 13","date":"2026-06-23","time":"19:00 UTC-4","team1":"Panama","team2":"Croatia","group":"Group L","ground":"Toronto","ft":null},{"round":"Matchday 17","date":"2026-06-27","time":"17:00 UTC-4","team1":"Panama","team2":"England","group":"Group L","ground":"New York/New Jersey (East Rutherford)","ft":null},{"round":"Matchday 17","date":"2026-06-27","time":"17:00 UTC-4","team1":"Croatia","team2":"Ghana","group":"Group L","ground":"Philadelphia","ft":null},{"round":"Round of 32","date":"2026-06-28","time":"12:00 UTC-7","team1":"2A","team2":"2B","group":null,"ground":"Los Angeles (Inglewood)","ft":null},{"round":"Round of 32","date":"2026-06-29","time":"16:30 UTC-4","team1":"Germany","team2":"3A/B/C/D/F","group":null,"ground":"Boston (Foxborough)","ft":null},{"round":"Round of 32","date":"2026-06-29","time":"19:00 UTC-6","team1":"1F","team2":"2C","group":null,"ground":"Monterrey (Guadalupe)","ft":null},{"round":"Round of 32","date":"2026-06-29","time":"12:00 UTC-5","team1":"1C","team2":"2F","group":null,"ground":"Houston","ft":null},{"round":"Round of 32","date":"2026-06-30","time":"17:00 UTC-4","team1":"1I","team2":"3C/D/F/G/H","group":null,"ground":"New York/New Jersey (East Rutherford)","ft":null},{"round":"Round of 32","date":"2026-06-30","time":"12:00 UTC-5","team1":"2E","team2":"2I","group":null,"ground":"Dallas (Arlington)","ft":null},{"round":"Round of 32","date":"2026-06-30","time":"19:00 UTC-6","team1":"Mexico","team2":"3C/E/F/H/I","group":null,"ground":"Mexico City","ft":null},{"round":"Round of 32","date":"2026-07-01","time":"12:00 UTC-4","team1":"1L","team2":"3E/H/I/J/K","group":null,"ground":"Atlanta","ft":null},{"round":"Round of 32","date":"2026-07-01","time":"17:00 UTC-7","team1":"USA","team2":"3B/E/F/I/J","group":null,"ground":"San Francisco Bay Area (Santa Clara)","ft":null},{"round":"Round of 32","date":"2026-07-01","time":"13:00 UTC-7","team1":"1G","team2":"3A/E/H/I/J","group":null,"ground":"Seattle","ft":null},{"round":"Round of 32","date":"2026-07-02","time":"19:00 UTC-4","team1":"2K","team2":"2L","group":null,"ground":"Toronto","ft":null},{"round":"Round of 32","date":"2026-07-02","time":"12:00 UTC-7","team1":"1H","team2":"2J","group":null,"ground":"Los Angeles (Inglewood)","ft":null},{"round":"Round of 32","date":"2026-07-02","time":"20:00 UTC-7","team1":"1B","team2":"3E/F/G/I/J","group":null,"ground":"Vancouver","ft":null},{"round":"Round of 32","date":"2026-07-03","time":"18:00 UTC-4","team1":"1J","team2":"2H","group":null,"ground":"Miami (Miami Gardens)","ft":null},{"round":"Round of 32","date":"2026-07-03","time":"20:30 UTC-5","team1":"1K","team2":"3D/E/I/J/L","group":null,"ground":"Kansas City","ft":null},{"round":"Round of 32","date":"2026-07-03","time":"13:00 UTC-5","team1":"2D","team2":"2G","group":null,"ground":"Dallas (Arlington)","ft":null},{"round":"Round of 16","date":"2026-07-04","time":"17:00 UTC-4","team1":"W74","team2":"W77","group":null,"ground":"Philadelphia","ft":null},{"round":"Round of 16","date":"2026-07-04","time":"12:00 UTC-5","team1":"W73","team2":"W75","group":null,"ground":"Houston","ft":null},{"round":"Round of 16","date":"2026-07-05","time":"16:00 UTC-4","team1":"W76","team2":"W78","group":null,"ground":"New York/New Jersey (East Rutherford)","ft":null},{"round":"Round of 16","date":"2026-07-05","time":"18:00 UTC-6","team1":"W79","team2":"W80","group":null,"ground":"Mexico City","ft":null},{"round":"Round of 16","date":"2026-07-06","time":"14:00 UTC-5","team1":"W83","team2":"W84","group":null,"ground":"Dallas (Arlington)","ft":null},{"round":"Round of 16","date":"2026-07-06","time":"17:00 UTC-7","team1":"W81","team2":"W82","group":null,"ground":"Seattle","ft":null},{"round":"Round of 16","date":"2026-07-07","time":"12:00 UTC-4","team1":"W86","team2":"W88","group":null,"ground":"Atlanta","ft":null},{"round":"Round of 16","date":"2026-07-07","time":"13:00 UTC-7","team1":"W85","team2":"W87","group":null,"ground":"Vancouver","ft":null},{"round":"Quarter-final","date":"2026-07-09","time":"16:00 UTC-4","team1":"W89","team2":"W90","group":null,"ground":"Boston (Foxborough)","ft":null},{"round":"Quarter-final","date":"2026-07-10","time":"12:00 UTC-7","team1":"W93","team2":"W94","group":null,"ground":"Los Angeles (Inglewood)","ft":null},{"round":"Quarter-final","date":"2026-07-11","time":"17:00 UTC-4","team1":"W91","team2":"W92","group":null,"ground":"Miami (Miami Gardens)","ft":null},{"round":"Quarter-final","date":"2026-07-11","time":"20:00 UTC-5","team1":"W95","team2":"W96","group":null,"ground":"Kansas City","ft":null},{"round":"Semi-final","date":"2026-07-14","time":"14:00 UTC-5","team1":"W97","team2":"W98","group":null,"ground":"Dallas (Arlington)","ft":null},{"round":"Semi-final","date":"2026-07-15","time":"15:00 UTC-4","team1":"W99","team2":"W100","group":null,"ground":"Atlanta","ft":null},{"round":"Match for third place","date":"2026-07-18","time":"17:00 UTC-4","team1":"L101","team2":"L102","group":null,"ground":"Miami (Miami Gardens)","ft":null},{"round":"Final","date":"2026-07-19","time":"15:00 UTC-4","team1":"W101","team2":"W102","group":null,"ground":"New York/New Jersey (East Rutherford)","ft":null}];
-
-/* ---------------- Team ratings (Elo) ----------------
-   Embedded fallback from worldcup2026_data.json, keyed to the dashboard's team
-   names. loadRatings() will fetch the live file and override this when served.
-   (The file's attack/defense factors are Elo-derived and equal per team, so they
-   cancel in a standard Poisson model — Elo is the faithful, granular signal.) */
-const ELO_FALLBACK = {"Algeria":1571.03, "Argentina":1874.81, "Australia":1578.66, "Austria":1597.4, "Belgium":1739.55, "Bosnia & Herzegovina":1385.77, "Brazil":1762.66, "Canada":1560.62, "Cape Verde":1369.29, "Colombia":1695.99, "Croatia":1712.24, "Curaçao":1293.08, "Czech Republic":1505.74, "DR Congo":1479.68, "Ecuador":1596.48, "Egypt":1565.56, "England":1825.97, "France":1869.43, "Germany":1731.3, "Ghana":1346.88, "Haiti":1296.61, "Iran":1619.58, "Iraq":1451.15, "Ivory Coast":1540.87, "Japan":1661.58, "Jordan":1390.1, "Mexico":1687.48, "Morocco":1756.94, "Netherlands":1751.1, "New Zealand":1276.66, "Norway":1555.6, "Panama":1540.6, "Paraguay":1503.5, "Portugal":1763.83, "Qatar":1452.37, "Saudi Arabia":1419.73, "Scotland":1499.92, "Senegal":1686.41, "South Africa":1428.38, "South Korea":1591.63, "Spain":1873.01, "Sweden":1509.79, "Switzerland":1650.75, "Tunisia":1479.1, "Turkey":1601.99, "USA":1675.7, "Uruguay":1673.07, "Uzbekistan":1461.21};
-// JSON uses a few different spellings than the fixtures feed.
-const ELO_NAME_FIX = {"United States":"USA","Bosnia and Herzegovina":"Bosnia & Herzegovina","Curacao":"Curaçao"};
-let ELO = {...ELO_FALLBACK};
-const DEFAULT_ELO = 1500;                          // for any team without a rating
-const eloOf = name => ELO[name]!=null ? ELO[name] : DEFAULT_ELO;
-
-// Group match (neutral): expected goals for each side from the Elo gap. The exp
-// form keeps a ~0 gap near the average total and skews scoring toward the favourite.
-const GOAL_BASE = 1.35, ELO_GOAL_K = 0.0010;
-function expectedGoals(eloA, eloB){
-  const d = (eloA - eloB) * ELO_GOAL_K;
-  return [GOAL_BASE*Math.exp(d), GOAL_BASE*Math.exp(-d)];
-}
-// Knockout (no draws): standard Elo win probability for A over B.
-const eloWinProb = (eloA, eloB) => 1 / (1 + Math.pow(10, (eloB - eloA)/400));
 
 /* ---------------- Time helpers ---------------- */
 // Parse "13:00 UTC-6" + date "2026-06-11" -> JS Date (absolute instant)
@@ -820,11 +710,6 @@ let LAST_UPDATED = null;
 const filters = { stage:"all", date:"all", search:"", quick:"all", hideFinished:false };
 let currentView = "matches";
 const expanded = new Set();   // ids of match rows whose detail panel is open
-let GROUP_PROBS = {};         // group -> { team: {p1,p2,p3} } from Monte-Carlo sim
-let GROUP_SIG = {};           // group -> signature of played results (cache key)
-let THIRD_QUAL = {};          // team -> P(3rd in group AND a top-8 qualifying third)
-let THIRD_SIG = "";           // signature of all group results (cache key for THIRD_QUAL)
-const SIM_OVERRIDES = {};     // knockout slot token -> simulated team (user pick)
 
 /* ---------------- Helpers ---------------- */
 const el = id => document.getElementById(id);
@@ -833,14 +718,14 @@ function teamHTML(name){
   const ph = /^[0-9]|^W\d|^L\d|\//.test(name);
   return `<span class="${ph?'ph':''}">${esc(name)}</span>`;
 }
-// Team label for the matches table: resolves knockout placeholders (incl. any
-// simulated pick) to a real nation; group matches stay as the plain team name.
+// Team label for the matches table: resolves knockout placeholders to a real
+// nation once decided; group matches stay as the plain team name.
 function matchTeamHTML(m, side){
   const tok = side===1 ? m.team1 : m.team2;
   if(m.isGroup) return teamHTML(tok);
   const s = resolveSlot(tok);
-  const cls = [s.ph?'ph':'', s.sim?'sim-name':''].filter(Boolean).join(' ');
-  return `<span class="${cls}">${esc(s.label)}${s.sim?' <span class="sim-tag">sim</span>':''}</span>`;
+  const cls = s.ph?'ph':'';
+  return `<span class="${cls}">${esc(s.label)}</span>`;
 }
 function fmtCountdown(ms){
   if(ms<=0) return "now";
@@ -1007,57 +892,6 @@ function matchDetailHTML(m, now){
         ${goalsHTML}
       </div>
     </div>
-    ${simBlockHTML(m)}
-  </div>`;
-}
-
-/* "Simulate participants" section — shown for knockout matches whose team1/team2
-   is still an unresolved placeholder. Lists candidate teams with their odds and a
-   selector to lock one in (which then propagates through the whole bracket). */
-function simBlockHTML(m){
-  if(m.isGroup) return "";
-  // Only offer simulation for slots that are still unresolved (open placeholder)
-  // or already locked to a user pick — not ones a finished group has decided.
-  const slots = [m.team1, m.team2].filter(tok=>{
-    if(!PLACEHOLDER_RE.test(tok)) return false;
-    const r = resolveSlot(tok);
-    return r.ph || r.sim;
-  });
-  if(!slots.length) return "";
-
-  const anySim = Object.keys(SIM_OVERRIDES).length>0;
-  const cols = slots.map(tok=>{
-    const cands = slotCandidates(tok);
-    const chosen = SIM_OVERRIDES[tok] || "";
-    const top = cands.slice(0,6);
-    const bars = top.length
-      ? top.map(c=>{
-          const flag = FLAGS[c.team] || "▢";
-          return `<div class="cand${c.team===chosen?' chosen':''}${SPANISH_TEAMS.has(c.team)?' es':''}">
-            <span class="cand-nm">${flag} ${esc(c.team)}</span>
-            <span class="cand-bar"><i style="width:${Math.max(2,Math.min(100,c.pct))}%"></i></span>
-            <span class="cand-pct">${fmtPct(c.pct)}</span>
-          </div>`;
-        }).join("")
-      : `<p class="detail-note">No candidates available yet.</p>`;
-    const opts = `<option value="">— leave open —</option>` +
-      cands.map(c=>`<option value="${esc(c.team)}"${c.team===chosen?' selected':''}>${esc(c.team)} · ${fmtPct(c.pct)}</option>`).join("");
-    // Honest caveats: best-third and winner/loser odds are approximations.
-    const note = /^3[A-L]/.test(tok) ? "Approximate: FIFA's best-third allocation isn't modelled exactly."
-      : /^[WL]\d/.test(tok) ? "From Elo win probability over every team that could reach this tie."
-      : "";
-    return `<div class="sim-slot">
-      <div class="sim-slot-h"${note?` title="${esc(note)}"`:""}>${esc(slotDescribe(tok))}${note?' <span class="sim-approx" aria-hidden="true">≈</span>':""}</div>
-      ${bars}
-      <label class="sim-pick">Lock in:
-        <select class="sim-select" data-token="${esc(tok)}" aria-label="Simulate participant for ${esc(slotDescribe(tok))}">${opts}</select></label>
-    </div>`;
-  }).join("");
-
-  return `<div class="sim-block">
-    <p class="detail-h">Simulate participants
-      <span class="sim-note">odds from Elo ratings &amp; results so far${anySim?` · <button type="button" class="sim-reset">reset all</button>`:""}</span></p>
-    <div class="sim-grid">${cols}</div>
   </div>`;
 }
 
@@ -1097,163 +931,27 @@ function computeStandings(group){
     .sort((x,y)=> y.Pts-x.Pts || y.GD-x.GD || y.GF-x.GF || x.team.localeCompare(y.team));
 }
 
-/* ---------------- Group-stage Monte-Carlo (qualification odds) ----------------
-   Each remaining group match is simulated with a Poisson goal model whose means
-   come from the two teams' Elo ratings (expectedGoals). Running many iterations
-   yields P(finish 1st / 2nd / 3rd) per team, which feeds the knockout simulator. */
-function poisson(lambda){
-  const L=Math.exp(-lambda); let k=0, p=1;
-  do{ k++; p*=Math.random(); }while(p>L);
-  return k-1;
-}
-// Build a group's fixed (played) table once; precompute each remaining match's
-// Elo-based goal means (Elo is static, so this needn't be redone per iteration).
-function buildGroupModel(grp){
-  const ms = MATCHES.filter(m=>m.group===grp);
-  const teams = [...new Set(ms.flatMap(m=>[m.team1,m.team2]))];
-  const base = {}; teams.forEach(t=>base[t]={Pts:0,GD:0,GF:0});
-  const unplayed = [];
-  ms.forEach(m=>{
-    if(!m.ft){
-      const [la,lb] = expectedGoals(eloOf(m.team1), eloOf(m.team2));
-      unplayed.push({a:m.team1, b:m.team2, la, lb});
-      return;
-    }
-    const [ga,gb]=m.ft, a=base[m.team1], b=base[m.team2];
-    a.GF+=ga; b.GF+=gb; a.GD+=ga-gb; b.GD+=gb-ga;
-    if(ga>gb) a.Pts+=3; else if(gb>ga) b.Pts+=3; else { a.Pts++; b.Pts++; }
-  });
-  return {grp, teams, base, unplayed};
-}
-// Simulate one realization of a group's remaining matches → final standings order.
-function simulateGroupOnce(model){
-  const {teams, base, unplayed} = model;
-  const tbl={}; teams.forEach(t=>{const r=base[t]; tbl[t]={team:t,Pts:r.Pts,GD:r.GD,GF:r.GF};});
-  unplayed.forEach(u=>{
-    const a=tbl[u.a], b=tbl[u.b];
-    const ga=poisson(u.la), gb=poisson(u.lb);
-    a.GF+=ga; b.GF+=gb; a.GD+=ga-gb; b.GD+=gb-ga;
-    if(ga>gb) a.Pts+=3; else if(gb>ga) b.Pts+=3; else { a.Pts++; b.Pts++; }
-  });
-  return Object.values(tbl).sort((x,y)=> y.Pts-x.Pts || y.GD-x.GD || y.GF-x.GF || x.team.localeCompare(y.team));
-}
-function simulateGroup(grp, iters){
-  const model = buildGroupModel(grp);
-  const {teams, unplayed} = model;
-  const counts = {}; teams.forEach(t=>counts[t]={p1:0,p2:0,p3:0});
-  if(!teams.length) return counts;
-  const N = unplayed.length ? iters : 1;   // nothing left to sim → table is fixed
-  for(let it=0; it<N; it++){
-    const order = simulateGroupOnce(model);
-    if(order[0]) counts[order[0].team].p1++;
-    if(order[1]) counts[order[1].team].p2++;
-    if(order[2]) counts[order[2].team].p3++;
-  }
-  const out={}; teams.forEach(t=>out[t]={p1:counts[t].p1/N, p2:counts[t].p2/N, p3:counts[t].p3/N});
-  return out;
-}
-// Joint cross-group sim: each iteration ranks all 12 third-placed teams by FIFA's
-// criteria (Pts, GD, GF) and keeps the best 8 — so THIRD_QUAL[team] = P(team finishes
-// 3rd in its group AND is among the eight thirds that actually advance to the R32.
-function computeThirdQual(iters){
-  const groups=[...new Set(MATCHES.filter(m=>m.isGroup).map(m=>m.group))];
-  if(!groups.length){ THIRD_QUAL={}; return; }
-  const models=groups.map(buildGroupModel);
-  const N = models.some(m=>m.unplayed.length) ? iters : 1;
-  const qual={};
-  for(let it=0; it<N; it++){
-    const thirds=[];
-    models.forEach(model=>{ const order=simulateGroupOnce(model); if(order[2]) thirds.push(order[2]); });
-    thirds.sort((a,b)=> b.Pts-a.Pts || b.GD-a.GD || b.GF-a.GF);
-    thirds.slice(0,8).forEach(t=>{ qual[t.team]=(qual[t.team]||0)+1; });
-  }
-  const out={}; Object.keys(qual).forEach(t=> out[t]=qual[t]/N);
-  THIRD_QUAL=out;
-}
-// Re-simulate only the groups whose played results changed since last time, so a
-// live refresh that didn't alter any score costs ~0 instead of re-running all 12.
-function computeGroupProbs(){
-  const next={}, nextSig={}; let combined="";
-  [...new Set(MATCHES.filter(m=>m.isGroup).map(m=>m.group))].forEach(grp=>{
-    const sig = MATCHES.filter(m=>m.group===grp)
-      .map(m=> m.ft ? `${m.team1} ${m.ft[0]}-${m.ft[1]} ${m.team2}` : "").join("|");
-    next[grp] = (GROUP_SIG[grp]===sig && GROUP_PROBS[grp]) ? GROUP_PROBS[grp] : simulateGroup(grp, 2500);
-    nextSig[grp] = sig; combined += grp+":"+sig+";";
-  });
-  GROUP_PROBS = next; GROUP_SIG = nextSig;
-  // Third-place qualification is cross-group, so cache it on the combined signature.
-  if(THIRD_SIG!==combined){ computeThirdQual(2500); THIRD_SIG=combined; }
-  clearSlotMemo();   // group probabilities changed → bracket distributions are stale
-}
-
 function renderGroups(){
   const groups = [...new Set(MATCHES.filter(m=>m.isGroup).map(m=>m.group))].sort();
   el("groupsGrid").innerHTML = groups.map(g=>{
     const rows = computeStandings(g);
     const played = MATCHES.filter(m=>m.group===g && m.ft).length;
     const total = MATCHES.filter(m=>m.group===g).length;
-    const gp = GROUP_PROBS[g] || {};
-    const advOf = t => { const p=gp[t]; return Math.min(1, (p?p.p1+p.p2:0) + (THIRD_QUAL[t]||0)); };
-    const body = rows.map((r,i)=>{
-      const adv = advOf(r.team);
-      return `
+    const body = rows.map((r,i)=>`
       <tr class="${i<2?'q':''}">
         <td class="pos">${i+1}</td>
         <td class="team">${esc(r.team)}</td>
         <td>${r.P}</td><td>${r.W}</td><td>${r.D}</td><td>${r.L}</td>
         <td>${r.GF}:${r.GA}</td><td>${r.GD>0?'+':''}${r.GD}</td>
         <td class="pts">${r.Pts}</td>
-        <td class="adv">${pctCell(adv)}</td>
-      </tr>`;}).join("");
+      </tr>`).join("");
     return `<div class="group-card">
       <h3>${esc(g)} <span class="gmeta">${played}/${total} played</span></h3>
       <table class="stand">
-        <thead><tr><th class="pos"></th><th class="team">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF:GA</th><th>GD</th><th>Pts</th><th class="adv" title="Probability of reaching the knockouts">Adv</th></tr></thead>
+        <thead><tr><th class="pos"></th><th class="team">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF:GA</th><th>GD</th><th>Pts</th></tr></thead>
         <tbody>${body}</tbody>
       </table></div>`;
   }).join("");
-}
-
-/* ---------------- Odds view ---------------- */
-// A probability cell: value text + a heat tint (sqrt-scaled so small odds still show).
-function pctCell(v){
-  if(!(v>0)) return `<span class="pc0">—</span>`;
-  const tint = Math.round(Math.min(1, Math.sqrt(v))*62);
-  return `<span class="pc" style="background:color-mix(in srgb,var(--brand-2) ${tint}%,transparent)">${fmtPct(v*100)}</span>`;
-}
-let oddsSort = {key:"champ", dir:-1};   // dir -1 = descending
-function renderOdds(){
-  const rows = tournamentOdds();
-  rows.sort((a,b)=> oddsSort.key==="team"
-    ? a.team.localeCompare(b.team)*oddsSort.dir
-    : (a[oddsSort.key]-b[oddsSort.key])*oddsSort.dir || b.champ-a.champ || a.team.localeCompare(b.team));
-
-  // Title-race bars: always top-12 by championship odds, regardless of table sort.
-  const top = [...rows].sort((a,b)=> b.champ-a.champ).slice(0,12);
-  const maxCh = Math.max(0.01, ...top.map(t=>t.champ));
-  el("titleRace").innerHTML = top.map(t=>{
-    const flag = FLAGS[t.team] || "▢";
-    return `<div class="tr-row${t.spanish?' es':''}">
-      <span class="tr-nm">${flag} ${esc(t.team)}</span>
-      <span class="tr-bar"><i style="width:${Math.max(1.5, t.champ/maxCh*100)}%"></i></span>
-      <span class="tr-pct">${fmtPct(t.champ*100)}</span>
-    </div>`;
-  }).join("");
-
-  const cols = [["team","Team"],["win","Win"],["adv","Adv"],["r16","R16"],["qf","QF"],["sf","SF"],["fin","Final"],["champ","🏆"]];
-  const arrow = k => oddsSort.key===k ? (oddsSort.dir<0?" ↓":" ↑") : "";
-  const head = `<thead><tr>`+cols.map(([k,lbl])=>
-    `<th data-key="${k}" class="${k==="team"?"odds-team":""}${oddsSort.key===k?" sorted":""}"${k==="champ"?' title="Win the tournament"':""}>${lbl}${arrow(k)}</th>`).join("")+`</tr></thead>`;
-  const bodyRows = rows.map(t=>{
-    const flag = FLAGS[t.team] || "▢";
-    return `<tr class="${t.spanish?"es":""}">
-      <td class="odds-team">${flag} ${esc(t.team)}</td>
-      <td>${pctCell(t.win)}</td><td>${pctCell(t.adv)}</td><td>${pctCell(t.r16)}</td>
-      <td>${pctCell(t.qf)}</td><td>${pctCell(t.sf)}</td><td>${pctCell(t.fin)}</td>
-      <td class="odds-champ">${pctCell(t.champ)}</td>
-    </tr>`;
-  }).join("");
-  el("oddsTable").innerHTML = head+`<tbody>${bodyRows}</tbody>`;
 }
 
 /* ---------------- Knockout bracket ---------------- */
@@ -1266,11 +964,10 @@ function groupComplete(group){
 // {team, label, confirmed, ph, spanish}
 function resolveSlot(token){
   const t = String(token||"").trim();
-  const real = (name,sim) => ({team:name, label:name, confirmed:!sim, sim:!!sim, ph:false, spanish:SPANISH_TEAMS.has(name)});
-  const open = label => ({team:null, label, confirmed:false, sim:false, ph:true, spanish:false});
+  const real = name => ({team:name, label:name, confirmed:true, ph:false, spanish:SPANISH_TEAMS.has(name)});
+  const open = label => ({team:null, label, confirmed:false, ph:true, spanish:false});
 
-  if(!PLACEHOLDER_RE.test(t)) return real(t,false);     // already a confirmed nation
-  if(SIM_OVERRIDES[t]) return real(SIM_OVERRIDES[t], true);  // user-simulated participant
+  if(!PLACEHOLDER_RE.test(t)) return real(t);           // already a confirmed nation
 
   let m = /^([12])([A-L])$/.exec(t);                    // group winner / runner-up
   if(m){
@@ -1296,110 +993,6 @@ function resolveSlot(token){
   return open(t);
 }
 
-/* Human label for an unresolved slot token (independent of any simulation pick). */
-function slotDescribe(token){
-  const t=String(token||"").trim();
-  let m=/^([12])([A-L])$/.exec(t); if(m) return (m[1]==="1"?"Winner ":"Runner-up ")+"Group "+m[2];
-  if(/^3[A-L]/.test(t)) return "Best 3rd ("+t.slice(1)+")";
-  m=/^([WL])(\d+)$/.exec(t); if(m) return (m[1]==="W"?"Winner":"Loser")+" of match "+m[2];
-  return t;
-}
-/* Probability distribution over the teams that could fill a slot token.
-   Returns a Map(team -> probability 0..1). Recurses through W/L references.
-   Memoized by token (invalidated when probs or sim picks change) — the whole-
-   tournament odds table calls this for every knockout slot, so caching matters. */
-let _slotDistMemo = new Map();
-function clearSlotMemo(){ _slotDistMemo = new Map(); }
-function slotDist(token, depth){
-  const t = String(token||"").trim();
-  const hit = _slotDistMemo.get(t);
-  if(hit) return hit;                       // callers treat the returned Map as read-only
-  const dist = _slotDist(t, depth||0);
-  _slotDistMemo.set(t, dist);
-  return dist;
-}
-function _slotDist(t, depth){
-  const dist = new Map();
-  const add = (team,p) => { if(team && p>0) dist.set(team,(dist.get(team)||0)+p); };
-
-  if(!PLACEHOLDER_RE.test(t)){ add(t,1); return dist; }   // a confirmed nation
-  if(SIM_OVERRIDES[t]){ add(SIM_OVERRIDES[t],1); return dist; }  // locked by user
-  if(depth>6) return dist;
-
-  let m=/^([12])([A-L])$/.exec(t);
-  if(m){
-    const pos=+m[1], probs=GROUP_PROBS["Group "+m[2]];
-    if(probs) Object.entries(probs).forEach(([team,p])=> add(team, pos===1?p.p1:p.p2));
-    return dist;
-  }
-  if(/^3[A-L]/.test(t)){   // best-third slot drawn from one of several groups
-    const groups=(t.slice(1).match(/[A-L]/g)||[]);
-    // Weight by P(3rd AND a top-8 qualifying third), normalized across the listed
-    // groups — so thirds that won't actually advance drop out of the candidate list.
-    const teamsOf = g => [...new Set(MATCHES.filter(x=>x.group==="Group "+g).flatMap(x=>[x.team1,x.team2]))];
-    let mass=0; const tmp=[];
-    groups.forEach(g=> teamsOf(g).forEach(team=>{ const p=THIRD_QUAL[team]||0; if(p>0){ tmp.push([team,p]); mass+=p; } }));
-    if(mass>0){ tmp.forEach(([team,p])=> add(team, p/mass)); return dist; }
-    groups.forEach(g=>{   // fallback (no qualification data yet): flat 3rd-place odds
-      const probs=GROUP_PROBS["Group "+g];
-      if(probs) Object.entries(probs).forEach(([team,p])=> add(team, p.p3/groups.length));
-    });
-    return dist;
-  }
-  m=/^([WL])(\d+)$/.exec(t);
-  if(m){
-    const isW = m[1]==="W", src=KO_BY_NUM[+m[2]];
-    if(src){
-      // Over every possible pairing (A from one feeder, B from the other), weight by
-      // the Elo win probability — so the winner slot favours the stronger entrant and
-      // the loser slot is its complement (no longer an identical 50/50).
-      const da=slotDist(src.team1,depth+1), db=slotDist(src.team2,depth+1);
-      da.forEach((pa,A)=> db.forEach((pb,B)=>{
-        const w = eloWinProb(eloOf(A), eloOf(B));   // P(A beats B)
-        add(A, pa*pb*(isW ? w : 1-w));
-        add(B, pa*pb*(isW ? 1-w : w));
-      }));
-    }
-    return dist;
-  }
-  return dist;
-}
-// Sorted [{team,pct}] (pct 0..100) of possible participants for a slot token.
-function slotCandidates(token){
-  const arr=[...slotDist(token).entries()].map(([team,p])=>({team,pct:p*100}));
-  return arr.sort((a,b)=> b.pct-a.pct || a.team.localeCompare(b.team));
-}
-const fmtPct = p => p>=9.5 ? Math.round(p)+"%" : p.toFixed(1)+"%";
-
-/* Whole-tournament odds per team, derived from the same engine the simulator uses.
-   P(reach a round) = P(win the prior-round match): summing slotDist over a round's
-   winner tokens is exact because a team can only be in one match per round. */
-function tournamentOdds(){
-  const sumRange = (a,b) => { const o={}; for(let n=a;n<=b;n++) slotDist("W"+n).forEach((p,t)=> o[t]=(o[t]||0)+p); return o; };
-  const r16 = sumRange(73,88);   // win Round of 32  → reach Round of 16
-  const qf  = sumRange(89,96);   // win Round of 16  → reach Quarter-finals
-  const sf  = sumRange(97,100);  // win Quarter-final → reach Semi-finals
-  const fin = sumRange(101,102); // win Semi-final   → reach Final
-  const champ = {}; slotDist("W104").forEach((p,t)=> champ[t]=p);
-  const win={}, adv={};
-  Object.values(GROUP_PROBS).forEach(g=> Object.entries(g).forEach(([t,p])=>{ win[t]=p.p1; adv[t]=(adv[t]||0)+p.p1+p.p2; }));
-  Object.entries(THIRD_QUAL).forEach(([t,p])=> adv[t]=(adv[t]||0)+p);
-  const teams=new Set([...Object.keys(adv), ...Object.keys(champ)]);
-  return [...teams].map(t=>{
-    const a = Math.min(1, adv[t]||0);
-    // Clamp each round ≤ the previous so the row is always monotonic on screen
-    // (independent Monte-Carlo runs + the best-third approximation can otherwise
-    // leave a sub-percent inconsistency for a borderline team).
-    const R16 = Math.min(r16[t]||0, a);
-    const QF  = Math.min(qf[t]||0, R16);
-    const SF  = Math.min(sf[t]||0, QF);
-    const FIN = Math.min(fin[t]||0, SF);
-    const CH  = Math.min(champ[t]||0, FIN);
-    return { team:t, elo:eloOf(t), spanish:SPANISH_TEAMS.has(t),
-      win:win[t]||0, adv:a, r16:R16, qf:QF, sf:SF, fin:FIN, champ:CH };
-  }).sort((a,b)=> b.champ-a.champ || b.adv-a.adv || b.elo-a.elo);
-}
-
 // Country flag emoji for the teams in the tournament; placeholders get none.
 const FLAGS = {
   "Mexico":"🇲🇽","South Africa":"🇿🇦","South Korea":"🇰🇷","Czech Republic":"🇨🇿",
@@ -1420,8 +1013,8 @@ function slotRowHTML(s, score, win){
   const flag = s.team && FLAGS[s.team]
     ? `<span class="fl">${FLAGS[s.team]}</span>`
     : `<span class="fl ph-fl">▢</span>`;
-  return `<div class="bk-side${s.ph?' ph':''}${s.spanish?' es':''}${win?' win':''}${s.sim?' sim':''}">
-    <span class="nm">${flag}<span class="lbl">${esc(s.label)}${s.sim?' <span class="sim-tag">sim</span>':''}</span></span>
+  return `<div class="bk-side${s.ph?' ph':''}${s.spanish?' es':''}${win?' win':''}">
+    <span class="nm">${flag}<span class="lbl">${esc(s.label)}</span></span>
     <span class="sc">${score!=null?score:""}</span></div>`;
 }
 function matchCardHTML(m, extraClass){
@@ -1564,7 +1157,6 @@ function renderAll(){
   else if(currentView==="watch") renderWatch(now);
   else if(currentView==="groups") renderGroups();
   else if(currentView==="bracket") renderBracket();
-  else if(currentView==="odds") renderOdds();
   tickCountdowns();
 }
 
@@ -1572,37 +1164,11 @@ function renderAll(){
 function setData(raw, source){
   MATCHES = normalize(raw);
   assignKnockoutNumbers();
-  computeGroupProbs();         // qualification odds for the knockout simulator
-  pruneStaleOverrides();       // drop saved sim picks for slots results have now decided
   SOURCE = source;
   buildControls();
   restoreControlSelection();   // keep dropdowns in sync with active filters after a rebuild
   updateSourceBadge();
   renderAll();
-}
-// Remove simulator picks whose slot is now settled by an actual result (e.g. a group
-// finished, or a knockout tie was played) — keeps restored/legacy picks honest.
-function pruneStaleOverrides(){
-  Object.keys(SIM_OVERRIDES).forEach(t=>{
-    let dead=false, m=/^([12])([A-L])$/.exec(t);
-    if(m){ if(groupComplete("Group "+m[2])) dead=true; }
-    else if((m=/^([WL])(\d+)$/.exec(t))){ const src=KO_BY_NUM[+m[2]]; if(src && src.ft && src.ft[0]!==src.ft[1]) dead=true; }
-    if(dead) delete SIM_OVERRIDES[t];
-  });
-  clearSlotMemo();
-}
-/* ---------------- Persistence (filters, view, simulator picks) ---------------- */
-function saveState(){
-  try{ localStorage.setItem("wc-state", JSON.stringify({picks:SIM_OVERRIDES, filters, view:currentView})); }catch(e){}
-}
-function loadState(){
-  let st; try{ st=JSON.parse(localStorage.getItem("wc-state")||"null"); }catch(e){}
-  if(!st || typeof st!=="object") return;
-  if(st.filters && typeof st.filters==="object") Object.assign(filters, st.filters);
-  if(typeof st.view==="string" && ["matches","watch","groups","bracket","odds"].includes(st.view)) currentView=st.view;
-  if(st.picks && typeof st.picks==="object"){
-    Object.entries(st.picks).forEach(([tok,team])=>{ if(typeof team==="string") SIM_OVERRIDES[tok]=team; });
-  }
 }
 // buildControls() resets the <select> elements; re-apply the active filter values so
 // the Stage/Date dropdowns don't silently fall back to "All" after a refresh/live load.
@@ -1639,24 +1205,6 @@ async function loadLive(){
     if(SOURCE!=="live") updateSourceBadge();
   }
 }
-// Fetch worldcup2026_data.json for live Elo ratings; falls back to the embedded
-// copy (so it still works offline / via file://). Recomputes the sim on success.
-async function loadRatings(){
-  try{
-    const res = await fetch("worldcup2026_data.json",{cache:"no-store"});
-    if(!res.ok) throw new Error("HTTP "+res.status);
-    const json = await res.json();
-    if(!json || !Array.isArray(json.teams) || !json.teams.length) throw new Error("no teams");
-    const next={};
-    json.teams.forEach(t=>{ if(t && t.name!=null && t.elo!=null) next[ELO_NAME_FIX[t.name]||t.name]=+t.elo; });
-    ELO = next;
-    GROUP_PROBS={}; GROUP_SIG={}; THIRD_SIG="";   // ratings changed → invalidate caches
-    computeGroupProbs();
-    renderAll();
-  }catch(e){
-    console.warn("Ratings fetch failed, using embedded Elo:", e.message);
-  }
-}
 
 /* ---------------- Theme (dark mode) ---------------- */
 function currentTheme(){
@@ -1689,8 +1237,6 @@ function activateTab(tab, focus){
   el("view-watch").classList.toggle("hide",currentView!=="watch");
   el("view-groups").classList.toggle("hide",currentView!=="groups");
   el("view-bracket").classList.toggle("hide",currentView!=="bracket");
-  el("view-odds").classList.toggle("hide",currentView!=="odds");
-  saveState();
   renderAll();
   if(focus) tab.focus();
 }
@@ -1717,11 +1263,6 @@ function wireEvents(){
     activateTab(tabs[j], true);   // roving focus + activate (auto-activation pattern)
   });
   el("matchBody").addEventListener("click",e=>{
-    if(e.target.closest(".sim-reset")){            // clear all simulated participants
-      for(const k in SIM_OVERRIDES) delete SIM_OVERRIDES[k];
-      clearSlotMemo(); saveState(); renderAll(); return;
-    }
-    if(e.target.closest(".sim-select,.sim-pick")) return; // interacting with the simulator
     if(window.getSelection && String(window.getSelection())) return; // don't toggle on text selection
     const row=e.target.closest("tr.match"); if(!row) return;
     toggleMatch(row.dataset.id);
@@ -1733,32 +1274,17 @@ function wireEvents(){
     e.preventDefault();                  // stop Space from scrolling the page
     toggleMatch(row.dataset.id);
   });
-  el("matchBody").addEventListener("change",e=>{
-    const sel=e.target.closest("select.sim-select"); if(!sel) return;
-    const tok=sel.dataset.token;
-    // Only accept a value that's an actual candidate for this slot (guards against
-    // stale/programmatic values); empty clears the override.
-    if(sel.value && slotCandidates(tok).some(c=>c.team===sel.value)) SIM_OVERRIDES[tok]=sel.value;
-    else delete SIM_OVERRIDES[tok];
-    clearSlotMemo(); saveState(); renderAll();
-  });
-  el("fStage").addEventListener("change",e=>{filters.stage=e.target.value; saveState(); renderMatches(Date.now());});
-  el("fDate").addEventListener("change",e=>{filters.date=e.target.value; saveState(); renderMatches(Date.now());});
-  el("fSearch").addEventListener("input",e=>{filters.search=e.target.value.trim(); saveState(); renderMatches(Date.now());});
-  el("fHideFinished").addEventListener("change",e=>{filters.hideFinished=e.target.checked; saveState(); renderMatches(Date.now());});
+  el("fStage").addEventListener("change",e=>{filters.stage=e.target.value; renderMatches(Date.now());});
+  el("fDate").addEventListener("change",e=>{filters.date=e.target.value; renderMatches(Date.now());});
+  el("fSearch").addEventListener("input",e=>{filters.search=e.target.value.trim(); renderMatches(Date.now());});
+  el("fHideFinished").addEventListener("change",e=>{filters.hideFinished=e.target.checked; renderMatches(Date.now());});
   el("quickChips").addEventListener("click",e=>{
     const c=e.target.closest(".chip"); if(!c) return;
     document.querySelectorAll("#quickChips .chip").forEach(x=>{
       x.classList.remove("active"); x.setAttribute("aria-pressed","false");
     });
     c.classList.add("active"); c.setAttribute("aria-pressed","true");
-    filters.quick=c.dataset.q; saveState(); renderMatches(Date.now());
-  });
-  el("oddsTable").addEventListener("click",e=>{
-    const th=e.target.closest("th[data-key]"); if(!th) return;
-    const k=th.dataset.key;
-    oddsSort = (oddsSort.key===k) ? {key:k, dir:-oddsSort.dir} : {key:k, dir:k==="team"?1:-1};
-    renderOdds();
+    filters.quick=c.dataset.q; renderMatches(Date.now());
   });
   el("tzSelect").addEventListener("change",e=>{
     const opt=e.target.selectedOptions[0];
@@ -1768,14 +1294,11 @@ function wireEvents(){
 }
 
 /* ---------------- Init ---------------- */
-loadState();                   // restore saved filters, view and simulator picks
 syncThemeButton();             // match button to theme set pre-paint
 buildTzControl();
-setData(EMBEDDED, "embedded"); // instant render (honours restored filters/picks)
+setData(EMBEDDED, "embedded"); // instant render
 updateTzLabels();
 wireEvents();
-activateTab(el("tab-"+currentView) || el("tab-matches"), false);  // reflect restored view
-loadRatings();                 // try to upgrade Elo ratings from worldcup2026_data.json
 loadLive();                    // try to upgrade to live data
 setInterval(tickCountdowns, 1000);
 setInterval(renderAll, 60000); // refresh statuses/highlights each minute
